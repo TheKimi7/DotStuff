@@ -2408,5 +2408,5 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 
 /* ===== DotStuff: dot-matrix shell font (panel, menus, pop-ups); apps keep the system font ===== */
 stage { font-family: "Ndot57Caps"; }
-.applet-label { font-family: "NType 82"; font-weight: normal; }
+.applet-label { font-family: "NType 82"; font-weight: bold; }
 .calendar-today-day-label, .calendar-today-date-label, .calendar-month-label { font-family: "Ndot57Caps"; font-weight: normal; }

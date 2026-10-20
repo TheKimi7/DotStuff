@@ -14,7 +14,7 @@ installed and configured with one script, and undone with one more.**
 
 | Part | Details |
 |---|---|
-| **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
+| **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, bold NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
 | **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
 | **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Every Papirus app, settings and session icon becomes a white stencil on a dark tile; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. Right-click > Configure to change them. |

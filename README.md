@@ -16,7 +16,7 @@ installed and configured with one script, and undone with one more.**
 |---|---|
 | **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, and a dot-matrix font for the panel clock, menus and calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
 | **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
-| **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Apps and session icons become white stencils on dark tiles; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
+| **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Every Papirus app, settings and session icon becomes a white stencil on a dark tile; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |
@@ -38,8 +38,8 @@ cd DotStuff
 `install.sh` checks for the packages it needs (`python3-pil python3-gi gir1.2-gdkpixbuf-2.0
 librsvg2-common gtk-update-icon-cache fontconfig papirus-icon-theme`) and offers to install
 the missing ones with `sudo apt-get`. That is the only step that needs root; everything else
-goes into your home folder. The first run takes a few minutes (it converts about 2,000 icons)
-and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
+goes into your home folder. The first run takes about 5–10 minutes (it converts roughly 10,000
+icons into two icon themes, about 570 MB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
 
 ### Options
 

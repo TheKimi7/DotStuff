@@ -15,7 +15,7 @@ installed and configured with one script, and undone with one more.**
 | Part | Details |
 |---|---|
 | **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, and a dot-matrix font for the panel clock, menus and calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
-| **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Apps and session icons become white stencils on dark tiles; folders, file types, devices and coloured status icons become white line art. New apps are converted automatically. |
+| **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Apps and session icons become white stencils on dark tiles; folders and file types are Papirus in greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |

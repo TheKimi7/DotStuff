@@ -157,6 +157,10 @@ def fontsettings(c):
     apply_setting(c.state, b, "org.nemo.desktop", "font", "Ndot55Caps 10", c.dry_run, c.log)
     apply_setting(c.state, b, "org.cinnamon.settings-daemon.plugins.xsettings", "antialiasing", "rgba", c.dry_run, c.log)
     apply_setting(c.state, b, "org.cinnamon.settings-daemon.plugins.xsettings", "hinting", "slight", c.dry_run, c.log)
+    # lock screen (cinnamon-screensaver); its colours and shapes come from the DotStuff theme
+    apply_setting(c.state, b, "org.cinnamon.desktop.screensaver", "font-time", "Ndot 57 112", c.dry_run, c.log)
+    apply_setting(c.state, b, "org.cinnamon.desktop.screensaver", "font-date", "Ndot57Caps 22", c.dry_run, c.log)
+    apply_setting(c.state, b, "org.cinnamon.desktop.screensaver", "font-message", "NType 82 14", c.dry_run, c.log)
 
 
 def icons(c):

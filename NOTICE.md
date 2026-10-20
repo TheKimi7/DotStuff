@@ -7,7 +7,7 @@ It is an unofficial fan project and is **not affiliated with or endorsed by Noth
 
 | Part | Author | Licence | Notes |
 |---|---|---|---|
-| `theme/DotStuff` | based on [Orchis](https://github.com/vinceliuice/Orchis-theme) (Orchis-Dark-Compact, 2024-11-03) by vinceliuice | GPL-3.0 | Recoloured to black with a red accent; Cinnamon panel, menus and pop-ups made black; dot-matrix shell font added. |
+| `theme/DotStuff` | based on [Orchis](https://github.com/vinceliuice/Orchis-theme) (Orchis-Dark-Compact, 2024-11-03) by vinceliuice | GPL-3.0 | Recoloured to black with a red accent; Cinnamon panel, menus and pop-ups made black; dot-matrix shell font and lock-screen styles added (the lock-screen rules follow the structure of cinnamon-screensaver's own stylesheet, GPL-2.0+). |
 | `vendor/monotile` | monotile | GPL-3.0 | Icon theme generator and desklets used by DotStuff. |
 | `assets/dotstuff-menu.svg` | DotStuff | GPL-3.0 | |
 

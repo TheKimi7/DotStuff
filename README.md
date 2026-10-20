@@ -15,6 +15,7 @@ installed and configured with one script, and undone with one more.**
 | Part | Details |
 |---|---|
 | **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, and a dot-matrix font for the panel clock, menus and calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
+| **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
 | **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Apps and session icons become white stencils on dark tiles; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
@@ -75,6 +76,7 @@ existing AOSP cursor install, or a menu button with your own custom icon) are le
 | Cursor | aosp-cursors, size 18 |
 | Window title font / desktop icon font | Ndot57Caps 12 / Ndot55Caps 10 |
 | Font smoothing | RGBA anti-aliasing, slight hinting |
+| Lock screen fonts (time / date / messages) | Ndot 57 112 / Ndot57Caps 22 / NType 82 14 |
 | Wallpaper | NothingWall (zoom) |
 | Colour scheme for GTK4 apps | prefer dark |
 | Desklets | Mono Date, Clock, Weather, System, Day at the top left |

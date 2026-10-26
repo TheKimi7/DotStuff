@@ -3,11 +3,10 @@
 
     python3 theme-src/build.py /path/to/Orchis-theme [output-dir]
 
-Needs the `libsass` Python package (only for building; DotStuff ships the result).
-Reproduces the parts of Orchis's own build that Cinnamon uses (GTK 2/3/4, Cinnamon,
-window borders) with the options: red accent, full black, solid panel, primary-coloured
-checks and radios, 16 px corners. Then it swaps Orchis's red for Nothing red and appends
-DotStuff's layers: the Android / Nothing OS look, shell fonts and the lock screen.
+Needs the `libsass` and `Pillow` Python packages (only for building; DotStuff ships the result).
+Rebuilds the parts of Orchis that Cinnamon uses (GTK 2/3/4, Cinnamon, window borders) with
+a red accent, charcoal surfaces, a solid panel, accent checks and radios and 16 px corners,
+swaps Orchis's red for Nothing red, then appends the layers in overlay/.
 
 Orchis is by vinceliuice (https://github.com/vinceliuice/Orchis-theme), GPL-3.0.
 Pinned source: tag 2024-11-03, commit fb8d14a37ed97ca7988720ed1c8e872db742d35d.
@@ -26,8 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 NOTHING_RED = "#D71921"
 ORCHIS_REDS = ("#E53935", "#F44336")
 CORNER = "16px"
-# Orchis's "black" surfaces (window, sidebars, views, cards) become charcoal: darker than
-# Orchis's own dark grey (#212121 / #2C2C2C) but not black, so text stays easy to read
+# replaces Orchis's black surfaces: darker than its own dark grey (#212121), not black
 CHARCOAL = {"e": "#161616", "f": "#191919", "g": "#1C1C1C", "h": "#222222"}
 
 TOKENS = {
@@ -51,7 +49,7 @@ TOKENS = {
 
 
 def tweak(src):
-    """Write _tweaks-temp.scss the way Orchis's install script does for our options."""
+    """Set our Orchis options, Nothing red and the charcoal surfaces in the copied source."""
     s = open(os.path.join(src, "_sass", "_tweaks.scss")).read()
     for var, old, new in (("theme", "default", "red"), ("blackness", "false", "true"),
                           ("opacity", "default", "solid"), ("check_radio", "default", "primary"),
@@ -129,7 +127,7 @@ def gtk_overlay(tokens):
     defs = "".join(f"@define-color ds_{k} {v};\n" for k, v in tokens.items()
                    if k not in ("hover_shade", "press_shade"))
     defs += f"@define-color ds_accent {NOTHING_RED};\n"
-    body = open(os.path.join(HERE, "overlay", "android-gtk3.css")).read()
+    body = open(os.path.join(HERE, "overlay", "android.css")).read()
     body = body.replace("@ds_hover_shade", tokens["hover_shade"]).replace("@ds_press_shade", tokens["press_shade"])
     return "\n" + defs + body
 
@@ -180,7 +178,7 @@ def build_variant(src, out_dir, mode):
     compile_scss(os.path.join(src, "cinnamon", f"cinnamon{else_dark}.scss"), os.path.join(c, "cinnamon.css"))
     shutil.copy(os.path.join(src, "cinnamon", "thumbnails", f"thumbnail-Red{else_dark}.png"), os.path.join(c, "thumbnail.png"))
 
-    # window borders
+    # Window borders
     m = os.path.join(t, "metacity-1")
     os.makedirs(m)
     shutil.copy(os.path.join(src, "metacity-1", "metacity-theme-3.xml"), m)
@@ -191,8 +189,8 @@ def build_variant(src, out_dir, mode):
 
     recolor(t)
 
-    # DotStuff layers
-    lock = open(os.path.join(HERE, "overlay", "lockscreen-gtk3.css")).read()
+    # DotStuff overlays
+    lock = open(os.path.join(HERE, "overlay", "lockscreen.css")).read()
     for ver in ("gtk-3.0", "gtk-4.0"):
         for f, variant in (("gtk.css", mode), ("gtk-dark.css", "dark")):
             with open(os.path.join(t, ver, f), "a") as fh:

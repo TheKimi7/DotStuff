@@ -39,7 +39,7 @@ cd DotStuff
 `install.sh` checks for the packages it needs (`python3-pil python3-gi gir1.2-gdkpixbuf-2.0
 librsvg2-common gtk-update-icon-cache fontconfig papirus-icon-theme`) and offers to install
 the missing ones with `sudo apt-get`. That is the only step that needs root; everything else
-goes into your home folder. The first run takes about 5–10 minutes (it converts roughly 10,000
+goes into your home folder. The first run takes about 5 to 10 minutes (it converts roughly 10,000
 icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
 
 ### Options

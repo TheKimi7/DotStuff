@@ -2401,16 +2401,17 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
   border-radius: 0px;
 }
 
-/* ===== DotStuff: Android / Nothing OS layer (Cinnamon panel, menus, pop-ups) =====
-   Double-brace placeholders are filled per variant by build.py (St has no named colours). */
+/* DotStuff: Android / Nothing OS layer for the Cinnamon panel, menus and pop-ups.
+   build.py fills the double-brace placeholders per variant (St has no named colours). */
 
+/* Panel */
 .panel-top, .panel-bottom, .panel-left, .panel-right {
     background-color: #ffffff; color: #000000; box-shadow: none; }
 .panel-bottom { border-top: 1px solid rgba(0, 0, 0, 0.10); }
 .panel-top { border-bottom: 1px solid rgba(0, 0, 0, 0.10); }
 .applet-box:hover, .panel-button:hover { background-color: rgba(0, 0, 0, 0.06); border-radius: 12px; }
 
-/* pop-ups and menus: rounded cards, Quick-Settings feel */
+/* Pop-ups and menus */
 .popup-menu-content, .menu .popup-menu-content, .popup-combo-menu .popup-menu-content {
     background-color: #ffffff; color: #000000; border: 1px solid rgba(0, 0, 0, 0.10); border-radius: 20px;
     padding: 8px; box-shadow: none; }
@@ -2420,7 +2421,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 .popup-sub-menu { background-color: #ffffff; border-radius: 14px; }
 .popup-separator-menu-item { background-color: rgba(0, 0, 0, 0.10); }
 
-/* application menu */
+/* Application menu */
 .menu-favorites-box, .menu-places-box, .menu-categories-box, .menu-applications-outer-box {
     background-color: transparent; }
 .menu-category-button, .menu-application-button { border-radius: 12px; }
@@ -2430,7 +2431,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
     color: #000000; padding: 6px 14px; }
 #menu-search-entry:focus { border-color: #000000; }
 
-/* notifications, OSD, switcher: cards */
+/* Notifications, OSD and window switcher */
 #notification, .notification { background-color: #ffffff; border-radius: 20px; border: 1px solid rgba(0, 0, 0, 0.10);
     color: #000000; }
 .osd-window, .info-osd, .switcher-list, .window-list-preview {
@@ -2440,10 +2441,10 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 .calendar-today { background-color: #D71921; color: #ffffff; border-radius: 999px; }
 .calendar-events-main-box { background-gradient-direction: none; background-color: #ffffff; border-radius: 16px; }
 
-/* toggles in pop-ups use the accent */
+/* Toggles */
 .toggle-switch-us:checked, .toggle-switch-intl:checked { background-color: #D71921; }
 
-/* ===== DotStuff: shell fonts (panel clock NType 82, menus and calendar dot-matrix) ===== */
+/* Fonts: dot-matrix shell, bold NType 82 panel clock */
 stage { font-family: "Ndot57Caps"; }
 .applet-label { font-family: "NType 82"; font-weight: bold; }
 .calendar-today-day-label, .calendar-today-date-label, .calendar-month-label { font-family: "Ndot57Caps"; font-weight: normal; }

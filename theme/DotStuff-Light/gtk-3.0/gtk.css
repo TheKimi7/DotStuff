@@ -215,7 +215,7 @@ headerbar label:disabled, tab label:disabled, button label:disabled {
 
 label.osd {
   border-radius: 16px;
-  background-color: rgba(10, 10, 10, 0.9);
+  background-color: rgba(26, 26, 26, 0.9);
   color: white;
 }
 
@@ -785,7 +785,7 @@ button.osd {
   min-width: 24px;
   min-width: 24px;
   padding: 6px;
-  background-color: #000000;
+  background-color: #161616;
   color: white;
 }
 
@@ -794,12 +794,12 @@ button.osd:focus {
 }
 
 button.osd:hover {
-  background-color: #262626;
+  background-color: #393939;
   color: white;
 }
 
 button.osd:active {
-  background-color: #404040;
+  background-color: #505050;
   color: white;
 }
 
@@ -3791,7 +3791,7 @@ tooltip {
 
 tooltip.background, tooltip.background.csd {
   border-radius: 16px;
-  background-color: rgba(10, 10, 10, 0.9);
+  background-color: rgba(26, 26, 26, 0.9);
   color: white;
 }
 
@@ -5780,7 +5780,7 @@ list.categories {
   min-height: 24px;
   padding: 0 4px;
   border-radius: 16px;
-  background-color: #030303;
+  background-color: #191919;
   color: white;
 }
 
@@ -6193,7 +6193,7 @@ window.background.chromium treeview.view button {
 
 tooltip.background.chromium {
   color: white;
-  background-color: #0a0a0a;
+  background-color: #1a1a1a;
 }
 
 /***********
@@ -7049,7 +7049,7 @@ na-tray-applet {
 }
 
 .caja-desktop.view .entry {
-  background-color: #0F0F0F;
+  background-color: #1C1C1C;
   color: white;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.12);
   caret-color: currentColor;
@@ -7152,7 +7152,7 @@ na-tray-applet {
 /* multimedia OSD */
 MsdOsdWindow.background.osd {
   border-radius: 16px;
-  background-color: rgba(10, 10, 10, 0.9);
+  background-color: rgba(26, 26, 26, 0.9);
   color: white;
 }
 
@@ -7853,7 +7853,7 @@ calendar.raven-calendar:selected {
 }
 
 .raven-mpris {
-  background-color: #030303;
+  background-color: #191919;
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -7958,7 +7958,7 @@ image.raven-mpris {
 
 .budgie-osd-window .drop-shadow {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.2), 0 4px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 6px 0 rgba(0, 0, 0, 0.12), inset 0 1px rgba(255, 255, 255, 0.1);
-  background-color: #000000;
+  background-color: #161616;
 }
 
 .budgie-osd-window image {

@@ -26,10 +26,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 NOTHING_RED = "#D71921"
 ORCHIS_REDS = ("#E53935", "#F44336")
 CORNER = "16px"
+# Orchis's "black" surfaces (window, sidebars, views, cards) become charcoal: darker than
+# Orchis's own dark grey (#212121 / #2C2C2C) but not black, so text stays easy to read
+CHARCOAL = {"e": "#161616", "f": "#191919", "g": "#1C1C1C", "h": "#222222"}
 
 TOKENS = {
     "dark": {
-        "bg": "#000000", "card": "#121212", "raised": "#1a1a1a", "button": "#222222",
+        "bg": "#161616", "card": "#1e1e1e", "raised": "#242424", "button": "#2c2c2c",
         "panel": "#000000", "fg": "#ffffff", "fg_dim": "rgba(255, 255, 255, 0.6)",
         "fg_faint": "rgba(255, 255, 255, 0.25)", "outline": "rgba(255, 255, 255, 0.10)",
         "outline_strong": "rgba(255, 255, 255, 0.35)", "hover": "rgba(255, 255, 255, 0.08)",
@@ -63,6 +66,13 @@ def tweak(src):
     if n != 2:
         raise SystemExit("Orchis source changed: red palette entries not found")
     open(pal, "w").write(p)
+    cpath = os.path.join(src, "_sass", "_colors.scss")
+    c = open(cpath).read()
+    for t, old in (("e", "$black"), ("f", "$grey-950"), ("g", "$grey-900"), ("h", "$grey-850")):
+        c, n = re.subn(rf"(@if \(\$type == '{t}'\) \{{ @return ){re.escape(old)};", rf"\g<1>{CHARCOAL[t]};", c, count=1)
+        if n != 1:
+            raise SystemExit(f"Orchis source changed: blackness surface {t} not found")
+    open(cpath, "w").write(c)
 
 
 def compile_scss(path, out):

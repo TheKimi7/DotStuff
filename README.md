@@ -40,11 +40,18 @@ cd DotStuff
 ./install.sh               # install and configure
 ```
 
+> [!IMPORTANT]
+> **The first install takes about 5 to 10 minutes. Let it finish.**
+> Most of that time goes into drawing about 10,000 icons. You will see a progress bar for each of
+> the four icon themes with the time left; the screen may look quiet before the first bar appears
+> while it checks your apps. Do not close the terminal. If you do stop it (Ctrl+C), nothing breaks:
+> run `./install.sh` again and it continues where it stopped. At the end Cinnamon restarts once;
+> your windows stay open.
+
 `install.sh` checks for the packages it needs (`python3-pil python3-gi gir1.2-gdkpixbuf-2.0
 librsvg2-common gtk-update-icon-cache fontconfig`) and offers to install
 the missing ones with `sudo apt-get`. That is the only step that needs root; everything else
-goes into your home folder. The first run takes about 5 to 10 minutes (it converts roughly 10,000
-icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
+goes into your home folder. The icon themes take about 1.1 GB of disk space.
 
 ### Options
 

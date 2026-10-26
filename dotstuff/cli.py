@@ -1,6 +1,8 @@
 """DotStuff command line: install, mode, restore, status."""
 import argparse
 import os
+import re
+import subprocess
 import sys
 
 from . import __version__, steps
@@ -16,9 +18,25 @@ def _parts(value):
     return parts
 
 
+TESTED_CINNAMON = ("6.4",)
+
+
+def cinnamon_version():
+    try:
+        out = subprocess.run(["cinnamon", "--version"], capture_output=True, text=True, timeout=10).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    m = re.search(r"(\d+)\.(\d+)", out)
+    return f"{m.group(1)}.{m.group(2)}" if m else None
+
+
 def cmd_install(a, backend):
     if "cinnamon" not in os.environ.get("XDG_CURRENT_DESKTOP", "").lower() and not a.force:
         raise SystemExit("DotStuff targets Cinnamon; this session is not Cinnamon (use --force to continue anyway)")
+    version = cinnamon_version()
+    if version and version not in TESTED_CINNAMON:
+        print(f"Note: DotStuff was tested on Cinnamon {', '.join(TESTED_CINNAMON)}; this is Cinnamon {version}. "
+              "It should work; if something looks wrong, ./install.sh --restore undoes everything.")
     only, skip = _parts(a.only), _parts(a.skip)
     chosen = [(n, f) for n, f in steps.ALL if (not only or n in only) and n not in skip]
     if a.prompt or "prompt" in only:

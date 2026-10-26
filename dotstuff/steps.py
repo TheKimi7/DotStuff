@@ -125,8 +125,6 @@ TERMINAL_PATH = f"/org/gnome/terminal/legacy/profiles:/:{TERMINAL_PROFILE}/"
 TERMINAL = {
     "visible-name": "DotStuff",
     "use-theme-colors": False,
-    "background-color": "rgb(0,0,0)",
-    "foreground-color": "rgb(170,170,170)",
     "bold-color-same-as-fg": True,
     "bold-color": "rgb(255,0,0)",
     "bold-is-bright": True,
@@ -135,21 +133,59 @@ TERMINAL = {
     "use-system-font": False,
     "font": "Lettera Mono LL 11",
 }
+TERMINAL_COLOURS = {
+    "dark": {"background-color": "rgb(0,0,0)", "foreground-color": "rgb(170,170,170)"},
+    "light": {"background-color": "rgb(242,242,242)", "foreground-color": "rgb(51,51,51)"},
+}
+TERMINAL_SCHEMA = f"org.gnome.Terminal.Legacy.Profile:{TERMINAL_PATH}"
+PROFILES = "org.gnome.Terminal.ProfilesList"
 
 
 def terminal(c):
-    """A DotStuff profile for GNOME Terminal (black, grey text, Lettera Mono), made the default."""
-    lst = "org.gnome.Terminal.ProfilesList"
-    if not c.backend.has(lst, "list"):
-        c.log("  skip terminal (GNOME Terminal is not installed)")
+    """A DotStuff profile for GNOME Terminal (Lettera Mono, grey on black or dark grey on
+    light grey), made the default. Other terminals are left alone."""
+    if not c.backend.has(PROFILES, "list"):
+        c.log("  skip terminal: GNOME Terminal is not installed (other terminals keep their own colours)")
         return
-    schema = f"org.gnome.Terminal.Legacy.Profile:{TERMINAL_PATH}"
-    for key, value in TERMINAL.items():
-        apply_setting(c.state, c.backend, schema, key, value, c.dry_run, c.log)
-    profiles = list(c.backend.current(lst, "list"))
+    for key, value in dict(TERMINAL, **TERMINAL_COLOURS[c.mode]).items():
+        apply_setting(c.state, c.backend, TERMINAL_SCHEMA, key, value, c.dry_run, c.log)
+    profiles = list(c.backend.current(PROFILES, "list"))
     if TERMINAL_PROFILE not in profiles:
-        apply_setting(c.state, c.backend, lst, "list", profiles + [TERMINAL_PROFILE], c.dry_run, c.log)
-    apply_setting(c.state, c.backend, lst, "default", TERMINAL_PROFILE, c.dry_run, c.log)
+        apply_setting(c.state, c.backend, PROFILES, "list", profiles + [TERMINAL_PROFILE], c.dry_run, c.log)
+    apply_setting(c.state, c.backend, PROFILES, "default", TERMINAL_PROFILE, c.dry_run, c.log)
+
+
+def _terminal_mode(c):
+    if c.backend.has(PROFILES, "list") and TERMINAL_PROFILE in c.backend.current(PROFILES, "list"):
+        for key, value in TERMINAL_COLOURS[c.mode].items():
+            apply_setting(c.state, c.backend, TERMINAL_SCHEMA, key, value, c.dry_run, c.log)
+
+
+GTK4_FILES = ("gtk.css", "gtk-dark.css", "assets")
+
+
+def _gtk4_links(c, mode):
+    """libadwaita apps ignore the GTK theme setting and read ~/.config/gtk-4.0 instead: point
+    it at the active DotStuff theme. A user's own files there are never replaced."""
+    d = os.path.join(paths.config_home(), "gtk-4.0")
+    theme_dir = os.path.join(paths.themes_dir(), THEME_NAMES[mode], "gtk-4.0")
+    links = c.state.setdefault("links", [])
+    for name in GTK4_FILES:
+        dest, target = os.path.join(d, name), os.path.join(theme_dir, name)
+        if os.path.lexists(dest) and dest not in links:
+            c.log(f"  {dest} is your own; GTK4 / libadwaita apps keep it")
+            continue
+        if os.path.islink(dest) and os.readlink(dest) == target:
+            continue
+        c.log(f"  link {dest} -> {THEME_NAMES[mode]}")
+        if not c.dry_run:
+            if not os.path.isdir(d):
+                _container(c, d)
+            if os.path.lexists(dest):
+                os.unlink(dest)
+            os.symlink(target, dest)
+            if dest not in links:
+                links.append(dest)
 
 
 def _tree_digest(root):
@@ -204,8 +240,11 @@ def apply_theme_settings(c, mode):
     for schema, key in (("org.cinnamon.desktop.interface", "gtk-theme"), ("org.gnome.desktop.interface", "gtk-theme"),
                         ("org.cinnamon.theme", "name"), ("org.cinnamon.desktop.wm.preferences", "theme")):
         apply_setting(c.state, c.backend, schema, key, name, c.dry_run, c.log)
-    apply_setting(c.state, c.backend, "org.gnome.desktop.interface", "color-scheme",
-                  "prefer-dark" if mode == "dark" else "prefer-light", c.dry_run, c.log)
+    scheme = "prefer-dark" if mode == "dark" else "prefer-light"
+    # GTK4 apps read the GNOME key; Electron, Firefox and libadwaita apps ask the portal, which reads xapp's
+    for schema in ("org.gnome.desktop.interface", "org.x.apps.portal"):
+        apply_setting(c.state, c.backend, schema, "color-scheme", scheme, c.dry_run, c.log)
+    _gtk4_links(c, mode)
 
 
 def icon_theme_name(shape, mode):
@@ -214,13 +253,14 @@ def icon_theme_name(shape, mode):
 
 
 def set_mode(c):
-    """Switch between light and dark: theme, colour scheme, wallpaper and the matching icons.
-    Desklets follow the theme by themselves; the lock screen stays dark."""
+    """Switch between light and dark: theme, colour scheme, wallpaper, terminal colours and the
+    matching icons. Desklets follow the theme by themselves; the lock screen stays dark."""
     name = THEME_NAMES[c.mode]
     if not os.path.isdir(os.path.join(paths.themes_dir(), name)):
         raise SystemExit(f"{name} is not installed; run ./install.sh --only theme first")
     apply_theme_settings(c, c.mode)
     _switch_wallpaper(c)
+    _terminal_mode(c)
     current = c.backend.current("org.cinnamon.desktop.interface", "icon-theme")
     if not current.startswith("Monotile-"):
         c.log(f"  icon theme {current} is not a Monotile theme; left as it is")
@@ -296,29 +336,40 @@ def icons(c):
         c.log("  icon watcher not enabled (no systemd user session); run `vendor/monotile/run-monotile watch enable` later")
 
 
+MENU_ICON = "dotstuff-menu-symbolic"     # symbolic: the panel's text colour paints it, the centre stays red
+OLD_MENU_ICON = "dotstuff-menu"          # DotStuff 0.1's fixed-colour icon
+
+
 def menu(c):
     dest = paths.menu_icon_path()
     for d in (os.path.dirname(os.path.dirname(os.path.dirname(dest))), os.path.dirname(os.path.dirname(dest)), os.path.dirname(dest)):
         _container(c, d)
-    if not os.path.exists(dest):
-        c.log("  menu button icon dotstuff-menu")
+    if not (os.path.exists(dest) and fetch.sha256(dest) == fetch.sha256(paths.MENU_ICON_SRC)):
+        c.log(f"  menu button icon {MENU_ICON}")
         if not c.dry_run:
             _copy(paths.MENU_ICON_SRC, dest)
             c.own(dest)
+    old = os.path.join(os.path.dirname(dest), OLD_MENU_ICON + ".svg")
+    if c.owns(old) and not c.dry_run:
+        if os.path.exists(old):
+            os.unlink(old)
+        c.state["owned"].remove(old)
     configs = paths.menu_applet_configs()
     if not configs:
         c.log("  menu applet not configured yet; open its settings once, then re-run to set the icon")
     for cfg in configs:
         with open(cfg, encoding="utf-8") as f:
             data = json.load(f)
-        if data.get("menu-custom", {}).get("value"):
-            c.log(f"  menu applet {os.path.basename(cfg)} already uses a custom icon; left as it is")
+        icon = data.get("menu-icon", {}).get("value")
+        if data.get("menu-custom", {}).get("value") and icon != OLD_MENU_ICON:
+            if icon != MENU_ICON:
+                c.log(f"  menu applet {os.path.basename(cfg)} already uses a custom icon; left as it is")
             continue
-        c.log(f"  menu applet {os.path.basename(cfg)}: icon dotstuff-menu, no label")
+        c.log(f"  menu applet {os.path.basename(cfg)}: icon {MENU_ICON}, no label")
         if not c.dry_run:
             remember_file(c.state, cfg)
             data["menu-custom"]["value"] = True
-            data["menu-icon"]["value"] = "dotstuff-menu"
+            data["menu-icon"]["value"] = MENU_ICON
             data["menu-label"]["value"] = ""
             with open(cfg + ".tmp", "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)

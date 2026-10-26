@@ -5,6 +5,8 @@ installed and configured with one script, and undone with one more.**
 
 ![Monochrome app icons, circle tiles](vendor/monotile/docs/demo-circle.png)
 
+![Light mode icons](vendor/monotile/docs/demo-light.png)
+
 ![Folders, file types and devices](vendor/monotile/docs/demo-system.png)
 
 > Unofficial fan project, not affiliated with or endorsed by Nothing Technology Limited.
@@ -15,15 +17,15 @@ installed and configured with one script, and undone with one more.**
 | Part | Details |
 |---|---|
 | **DotStuff-Dark and DotStuff-Light themes** | Android / Nothing OS look in a fixed charcoal or white palette with Nothing red: pill buttons and text fields, Material 3 switches, rounded cards, menus and dialogs, pill tabs. Black (or white) panel, bold NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Built from [Orchis](https://github.com/vinceliuice/Orchis-theme). |
-| **Light and dark mode** | `./install.sh mode light` / `./install.sh mode dark` switches the theme, the icons and the desktop widgets together. The lock screen stays dark. |
+| **Light and dark mode** | `./install.sh mode light` / `./install.sh mode dark` switches the theme, icons, desktop widgets, wallpaper and terminal colours together. The lock screen stays dark. |
 | **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
-| **Monochrome icons** | Icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**, plus **Monotile-Light-Circle** and **Monotile-Light-Squircle** for light mode (black symbol on a light-grey tile). Every Papirus app, settings and session icon becomes a white stencil on a dark tile; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
+| **Monochrome icons** | Icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**, plus **Monotile-Light-Circle** and **Monotile-Light-Squircle** for light mode (black symbol on a light-grey tile). Every app, settings and session icon becomes a white stencil on a dark tile; folders are black and file types greyscale; devices and coloured status icons become white line art. New apps are converted automatically. No other icon theme is needed: monotile includes the icons it starts from. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. They follow light and dark mode. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |
 | **Wallpapers** | Three Nothing wallpapers: a dark one by default, its light version in light mode, and one more dark one to pick in *Backgrounds*. |
-| **Terminal** | A DotStuff profile for GNOME Terminal, made the default: black background, grey text, red cursor, Lettera Mono LL 11. Your other profiles stay. |
-| **Menu button** | A white disc with a red centre dot. |
+| **Terminal** | A DotStuff profile for GNOME Terminal (the default terminal on Linux Mint), made the default: Lettera Mono LL 11, grey text on black (dark grey on light grey in light mode). Your other profiles stay; other terminals are left alone. |
+| **Menu button** | A white disc (black in light mode) with a red centre dot. |
 | **Bash prompt** (optional) | White `user@host`, red path. |
 
 ## Install
@@ -38,7 +40,7 @@ cd DotStuff
 ```
 
 `install.sh` checks for the packages it needs (`python3-pil python3-gi gir1.2-gdkpixbuf-2.0
-librsvg2-common gtk-update-icon-cache fontconfig papirus-icon-theme`) and offers to install
+librsvg2-common gtk-update-icon-cache fontconfig`) and offers to install
 the missing ones with `sudo apt-get`. That is the only step that needs root; everything else
 goes into your home folder. The first run takes about 5 to 10 minutes (it converts roughly 10,000
 icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
@@ -81,23 +83,34 @@ existing AOSP cursor install, or a menu button with your own custom icon) are le
 | Font smoothing | RGBA anti-aliasing, slight hinting |
 | Lock screen fonts (time / date / messages) | Ndot 57 112 / Ndot57Caps 22 / NType 82 14 |
 | Wallpaper | NothingWallpaper-1 (NothingWallpaper-2 in light mode), zoom |
-| GNOME Terminal default profile | DotStuff (black, grey text, Lettera Mono LL 11) |
-| Colour scheme for GTK4 apps | prefer dark (prefer light in light mode) |
+| GNOME Terminal default profile | DotStuff (Lettera Mono LL 11, dark or light colours) |
+| Colour scheme (GTK4, Electron and Firefox apps) | prefer dark (prefer light in light mode) |
+| `~/.config/gtk-4.0` | links to the DotStuff theme so libadwaita apps use it (skipped if you have your own files there) |
 | Desklets | Mono Date, Clock, Weather, System, Day at the top left |
-| Menu applet | custom icon `dotstuff-menu`, no label (only if it does not already use a custom icon) |
+| Menu applet | custom icon `dotstuff-menu-symbolic`, no label (only if it does not already use a custom icon) |
 
 Your normal application font is not changed.
 
 ## Limitations
 
 - **Cinnamon only** for now. Other desktops can still use the icon themes, cursor and GTK theme.
-- **Tested on Debian 13 with Cinnamon 6.4.** Mint 22 and Ubuntu 24.04 should work the same way;
-  reports welcome.
+- **Tested on Debian 13 with Cinnamon 6.4.** Linux Mint 22.x should work the same way; the
+  installer says so when your Cinnamon version differs. Reports welcome.
+- **Per user.** Everything goes into your home folder; other accounts on the same computer are
+  not changed. Run the installer once per user.
+- **Needs internet for the first install**: fonts and the cursor are downloaded from their
+  original sources. The first run also converts about 10,000 icons (5 to 10 minutes).
+- **Apps that draw their own look** are not themed:
+  - Qt and KDE apps.
+  - Flatpak apps (they cannot see `~/.themes`).
+  - Tray icons that an app sends as a ready-made picture instead of a theme icon name; some
+    Electron apps and clipboard managers do this. Those keep their own colours, so they may not
+    switch between light and dark.
 - Some windows (browser web apps, some Electron apps) show their own runtime icon in the panel
   instead of the themed one. See the [monotile README](vendor/monotile/README.md#limitations).
+- Desktop widgets are placed at the top left of the main screen for a 1080p-sized desktop; drag
+  them anywhere afterwards.
 - The weather desklet uses [wttr.in](https://wttr.in); everything else works offline.
-- If the menu applet has never been opened on a fresh account, its settings file does not exist
-  yet; open its settings once and run `./install.sh --only menu`.
 
 ## Light and dark
 
@@ -107,7 +120,7 @@ Your normal application font is not changed.
 ```
 
 Your tile shape is kept, the desklets switch by themselves, the wallpaper only switches if it
-is a DotStuff one, the terminal and lock screen stay dark, and `--restore` still puts back
+is a DotStuff one, the terminal switches too, the lock screen stays dark, and `--restore` still puts back
 whatever you had before DotStuff, however often you switch.
 
 ## Development

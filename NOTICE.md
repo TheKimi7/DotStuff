@@ -9,7 +9,8 @@ It is an unofficial fan project and is **not affiliated with or endorsed by Noth
 |---|---|---|---|
 | `theme/DotStuff-Dark`, `theme/DotStuff-Light` | built from the source of [Orchis](https://github.com/vinceliuice/Orchis-theme) by vinceliuice (tag 2024-11-03, commit fb8d14a) with `theme-src/build.py` | GPL-3.0 | Orchis options: red accent, full black, solid panel, 16 px corners; its red swapped for Nothing red. DotStuff adds an Android / Nothing OS layer (pill buttons and fields, Material 3 switches, rounded cards, menus and dialogs), dot-matrix shell fonts and lock-screen styles (the lock-screen rules follow the structure of cinnamon-screensaver's own stylesheet, GPL-2.0+). Orchis's licence is included in each theme as `COPYING`. |
 | `vendor/monotile` | monotile | GPL-3.0 | Icon theme generator and desklets used by DotStuff. |
-| `assets/dotstuff-menu.svg` | DotStuff | GPL-3.0 | |
+| `vendor/monotile/base` | [Papirus icon theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) by the Papirus Development Team | GPL-3.0 | Trimmed copy (one size per icon, default and black folders) that monotile converts and the icon themes inherit; see `base/PAPIRUS-COPYRIGHT`. |
+| `assets/dotstuff-menu-symbolic.svg` | DotStuff | GPL-3.0 | |
 | `wallpapers/NothingWallpaper-1, -2, -3` | Nothing Technology Limited | © Nothing; not covered by DotStuff's licence | Nothing's wallpapers, included for personal use. |
 
 ## Downloaded at install time (not redistributed by DotStuff)
@@ -28,7 +29,6 @@ checked against a SHA-256 hash (see `dotstuff/pins.py`).
 
 | Part | Licence |
 |---|---|
-| [Papirus icon theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme), the source monotile converts | GPL-3.0 |
 
 ## Inspiration
 

@@ -27,7 +27,6 @@ if [ "$cmd" = install ] && [[ " $* " != *" --skip-deps "* ]]; then
     ls /usr/lib/*/gdk-pixbuf-2.0/*/loaders/libpixbufloader*svg* >/dev/null 2>&1 || missing+=(librsvg2-common)
     command -v gtk-update-icon-cache >/dev/null || missing+=(gtk-update-icon-cache)
     command -v fc-cache >/dev/null || missing+=(fontconfig)
-    [ -d /usr/share/icons/Papirus ] || missing+=(papirus-icon-theme)
     if [ ${#missing[@]} -gt 0 ]; then
         echo "Missing packages: ${missing[*]}"
         if [ -t 0 ] && command -v apt-get >/dev/null; then

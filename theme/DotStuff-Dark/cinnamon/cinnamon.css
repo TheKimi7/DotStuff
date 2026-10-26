@@ -2410,10 +2410,17 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 
 /* Panel */
 .panel-top, .panel-bottom, .panel-left, .panel-right {
-    background-color: #000000; color: #ffffff; box-shadow: none; }
+    background-color: #000000; color: #ffffff; box-shadow: none;
+    error-color: #D71921; }  /* red parts of symbolic icons, e.g. the menu button's centre */
 .panel-bottom { border-top: 1px solid rgba(255, 255, 255, 0.10); }
 .panel-top { border-bottom: 1px solid rgba(255, 255, 255, 0.10); }
 .applet-box:hover, .panel-button:hover { background-color: rgba(255, 255, 255, 0.08); border-radius: 12px; }
+/* Orchis keeps a dark panel in both variants, so applet text and icons need our colour */
+.applet-box, .applet-box:hover, .applet-box:checked, .applet-box:checked:hover,
+.applet-icon, .applet-box:checked .applet-icon, .applet-label, .applet-box:checked .applet-label,
+.system-status-icon, .panel-button, .panel-status-button, .panel-top .panel-button:hover,
+.panel-bottom .panel-button:hover, .panel-top .panel-status-button:hover, .panel-bottom .panel-status-button:hover {
+    color: #ffffff; }
 
 /* Pop-ups and menus */
 .popup-menu-content, .menu .popup-menu-content, .popup-combo-menu .popup-menu-content {

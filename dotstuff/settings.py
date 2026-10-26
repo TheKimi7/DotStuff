@@ -62,7 +62,7 @@ def load_state():
         with open(state_path(), encoding="utf-8") as f:
             return json.load(f)
     except (OSError, ValueError):
-        return {"settings": {}, "files": {}, "owned": [], "desklets": [], "watcher": False}
+        return {"settings": {}, "files": {}, "owned": [], "desklets": [], "watcher": False, "links": []}
 
 
 def save_state(state):

@@ -4,7 +4,7 @@ import os
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 THEMES_SRC = os.path.join(REPO, "theme")            # DotStuff-Dark, DotStuff-Light
 WALLPAPERS_SRC = os.path.join(REPO, "wallpapers")
-MENU_ICON_SRC = os.path.join(REPO, "assets", "dotstuff-menu.svg")
+MENU_ICON_SRC = os.path.join(REPO, "assets", "dotstuff-menu-symbolic.svg")
 MONOTILE = os.path.join(REPO, "vendor", "monotile")
 
 
@@ -54,7 +54,7 @@ def cursors_parent():
 
 
 def menu_icon_path():
-    return os.path.join(data_home(), "icons", "hicolor", "scalable", "apps", "dotstuff-menu.svg")
+    return os.path.join(data_home(), "icons", "hicolor", "scalable", "apps", "dotstuff-menu-symbolic.svg")
 
 
 def menu_applet_configs():

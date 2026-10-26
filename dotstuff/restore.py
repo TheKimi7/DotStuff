@@ -27,7 +27,8 @@ def _strip_prompt_block(path):
 
 def restore(backend, purge=False, log=print):
     state = load_state()
-    if not (state["settings"] or state["files"] or state["owned"] or state["desklets"] or state.get("created_dirs")):
+    if not (state["settings"] or state["files"] or state["owned"] or state["desklets"] or state.get("created_dirs")
+            or state.get("links")):
         log("nothing to restore (DotStuff has not changed anything)")
         return state
 
@@ -50,6 +51,17 @@ def restore(backend, purge=False, log=print):
             shutil.copyfile(copy, path + ".tmp")
             os.replace(path + ".tmp", path)
             log(f"  restored {path}")
+
+    for link in state.get("links", []):
+        if os.path.islink(link):
+            os.unlink(link)
+    if state.get("links"):
+        log(f"  removed {len(state['links'])} GTK4 theme links from ~/.config/gtk-4.0")
+    for d in sorted(state.get("created_dirs", []), key=len, reverse=True):
+        try:
+            os.rmdir(d)                                  # only if empty
+        except OSError:
+            pass
 
     if state["desklets"] and backend.has("org.cinnamon", "enabled-desklets"):
         current = list(backend.current("org.cinnamon", "enabled-desklets"))

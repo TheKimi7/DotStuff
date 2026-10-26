@@ -25,6 +25,7 @@ class FakeSettings:
             ("org.cinnamon.desktop.interface", "gtk-theme"): "Mint-Y",
             ("org.cinnamon.theme", "name"): "Mint-Y-Dark",
             ("org.gnome.desktop.interface", "color-scheme"): "default",
+            ("org.x.apps.portal", "color-scheme"): "default",
             ("org.cinnamon.desktop.interface", "icon-theme"): "Mint-Y",
             ("org.cinnamon.desktop.background", "picture-uri"): "file:///usr/share/backgrounds/default.jpg",
             ("org.cinnamon.desktop.background", "picture-options"): "zoom",
@@ -172,12 +173,23 @@ class Steps(Isolated):
         with open(p) as f:
             data = json.load(f)
         self.assertEqual((data["menu-custom"]["value"], data["menu-icon"]["value"], data["menu-label"]["value"]),
-                         (True, "dotstuff-menu", ""))
+                         (True, "dotstuff-menu-symbolic", ""))
         self.assertTrue(os.path.exists(paths.menu_icon_path()))
         restore(b, purge=True, log=self.logs.append)
         with open(p) as f:
             self.assertEqual(json.load(f)["menu-icon"]["value"], "my-icon")
         self.assertFalse(os.path.exists(paths.menu_icon_path()))
+
+    def test_old_menu_icon_is_upgraded_to_symbolic(self):
+        p = self.menu_config(True)
+        with open(p) as f:
+            data = json.load(f)
+        data["menu-icon"]["value"] = "dotstuff-menu"
+        with open(p, "w") as f:
+            json.dump(data, f)
+        steps.menu(self.ctx(FakeSettings()))
+        with open(p) as f:
+            self.assertEqual(json.load(f)["menu-icon"]["value"], "dotstuff-menu-symbolic")
 
     def test_existing_custom_menu_icon_is_left_alone(self):
         p = self.menu_config(True)
@@ -229,6 +241,7 @@ class Steps(Isolated):
         steps.set_mode(c)
         self.assertEqual(b.current("org.cinnamon.theme", "name"), "DotStuff-Light")
         self.assertEqual(b.current("org.gnome.desktop.interface", "color-scheme"), "prefer-light")
+        self.assertEqual(b.current("org.x.apps.portal", "color-scheme"), "prefer-light")
         self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Light-Squircle")
         c.mode = "dark"
         steps.set_mode(c)
@@ -242,7 +255,7 @@ class Steps(Isolated):
     def test_terminal_profile_added_default_and_restored(self):
         b = FakeSettings()
         prof = f"org.gnome.Terminal.Legacy.Profile:{steps.TERMINAL_PATH}"
-        for k in steps.TERMINAL:
+        for k in list(steps.TERMINAL) + list(steps.TERMINAL_COLOURS["dark"]):
             b.defaults[(prof, k)] = None
         c = self.ctx(b)
         steps.terminal(c)
@@ -250,9 +263,37 @@ class Steps(Isolated):
         self.assertEqual(b.current(prof, "background-color"), "rgb(0,0,0)")
         self.assertEqual(b.current("org.gnome.Terminal.ProfilesList", "default"), steps.TERMINAL_PROFILE)
         self.assertIn(steps.TERMINAL_PROFILE, b.current("org.gnome.Terminal.ProfilesList", "list"))
+        steps.theme(c)
+        c.mode = "light"
+        steps.set_mode(c)
+        self.assertEqual(b.current(prof, "background-color"), "rgb(242,242,242)")
         save_state(c.state)
         restore(b, log=self.logs.append)
         self.assertEqual(b.user, {})                            # profile and list back to how they were
+
+    def test_gtk4_links_follow_mode_and_are_removed(self):
+        c = self.ctx(FakeSettings())
+        steps.theme(c)
+        d = os.path.join(os.environ["XDG_CONFIG_HOME"], "gtk-4.0")
+        css = os.path.join(d, "gtk.css")
+        self.assertIn("DotStuff-Dark", os.readlink(css))
+        self.assertTrue(os.path.isfile(css))
+        c.mode = "light"
+        steps.set_mode(c)
+        self.assertIn("DotStuff-Light", os.readlink(css))
+        save_state(c.state)
+        restore(c.backend, log=self.logs.append)
+        self.assertFalse(os.path.lexists(css))
+        self.assertFalse(os.path.exists(d))
+
+    def test_own_gtk4_css_is_kept(self):
+        d = os.path.join(os.environ["XDG_CONFIG_HOME"], "gtk-4.0")
+        os.makedirs(d)
+        with open(os.path.join(d, "gtk.css"), "w") as f:
+            f.write("/* mine */")
+        steps.theme(self.ctx(FakeSettings()))
+        with open(os.path.join(d, "gtk.css")) as f:
+            self.assertEqual(f.read(), "/* mine */")
 
     def test_terminal_skipped_without_gnome_terminal(self):
         b = FakeSettings()

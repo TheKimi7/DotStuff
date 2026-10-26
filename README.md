@@ -21,7 +21,8 @@ installed and configured with one script, and undone with one more.**
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. They follow light and dark mode. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |
-| **Wallpaper** | NothingWall, from [Panacea](https://github.com/EnsixD/Panacea). |
+| **Wallpapers** | Three Nothing wallpapers: a dark one by default, its light version in light mode, and one more dark one to pick in *Backgrounds*. |
+| **Terminal** | A DotStuff profile for GNOME Terminal, made the default: black background, grey text, red cursor, Lettera Mono LL 11. Your other profiles stay. |
 | **Menu button** | A white disc with a red centre dot. |
 | **Bash prompt** (optional) | White `user@host`, red path. |
 
@@ -30,7 +31,7 @@ installed and configured with one script, and undone with one more.**
 Linux Mint, Ubuntu or Debian, logged in to a **Cinnamon** session:
 
 ```sh
-git clone https://github.com/<you>/DotStuff.git
+git clone https://github.com/TheKimi7/DotStuff.git
 cd DotStuff
 ./install.sh --dry-run     # see everything it would change first
 ./install.sh               # install and configure
@@ -48,7 +49,7 @@ icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so t
 |---|---|
 | `--mode light` | start in light mode (default: dark); switch any time with `./install.sh mode dark` |
 | `--shape squircle` | squircle app icons instead of circles (both icon themes are always installed; switch any time in *System Settings > Themes*) |
-| `--only fonts,theme,...` / `--skip ...` | install only some parts: `fonts wallpaper theme cursor fontsettings icons menu desklets prompt` |
+| `--only fonts,theme,...` / `--skip ...` | install only some parts: `fonts wallpaper theme cursor fontsettings terminal icons menu desklets prompt` |
 | `--prompt` | also colour the bash prompt (added as a marked block in `~/.bashrc`) |
 | `--dry-run` | list what would change, change nothing |
 | `--no-reload` | do not restart Cinnamon at the end |
@@ -79,7 +80,8 @@ existing AOSP cursor install, or a menu button with your own custom icon) are le
 | Window title font / desktop icon font | Ndot57Caps 12 / Ndot55Caps 10 |
 | Font smoothing | RGBA anti-aliasing, slight hinting |
 | Lock screen fonts (time / date / messages) | Ndot 57 112 / Ndot57Caps 22 / NType 82 14 |
-| Wallpaper | NothingWall (zoom) |
+| Wallpaper | NothingWallpaper-1 (NothingWallpaper-2 in light mode), zoom |
+| GNOME Terminal default profile | DotStuff (black, grey text, Lettera Mono LL 11) |
 | Colour scheme for GTK4 apps | prefer dark (prefer light in light mode) |
 | Desklets | Mono Date, Clock, Weather, System, Day at the top left |
 | Menu applet | custom icon `dotstuff-menu`, no label (only if it does not already use a custom icon) |
@@ -100,11 +102,12 @@ Your normal application font is not changed.
 ## Light and dark
 
 ```sh
-./install.sh mode light    # DotStuff-Light, Monotile-Light icons, white desklet cards
+./install.sh mode light    # DotStuff-Light, Monotile-Light icons, white desklet cards, light wallpaper
 ./install.sh mode dark     # back to black
 ```
 
-Your tile shape is kept, the desklets switch by themselves, and `--restore` still puts back
+Your tile shape is kept, the desklets switch by themselves, the wallpaper only switches if it
+is a DotStuff one, the terminal and lock screen stay dark, and `--restore` still puts back
 whatever you had before DotStuff, however often you switch.
 
 ## Development

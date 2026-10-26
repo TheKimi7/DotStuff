@@ -90,18 +90,66 @@ def fonts(c):
         subprocess.run(["fc-cache", "-f", paths.fonts_dir()], check=False)
 
 
+WALLPAPERS = ("NothingWallpaper-1.jpg", "NothingWallpaper-2.png", "NothingWallpaper-3.png")
+MODE_WALLPAPER = {"dark": "NothingWallpaper-1.jpg", "light": "NothingWallpaper-2.png"}
+
+
+def _wallpaper_uri(name):
+    return "file://" + os.path.join(paths.wallpapers_dir(), name)
+
+
 def wallpaper(c):
-    dest = paths.wallpaper_path()
-    _own_dir(c, os.path.dirname(dest))
-    if not (os.path.isfile(dest) and fetch.sha256(dest) == pins.WALLPAPER_SHA):
-        c.log("  wallpaper NothingWall")
+    d = paths.wallpapers_dir()
+    _own_dir(c, d)
+    old = os.path.join(d, "NothingWall.png")             # DotStuff 0.1's wallpaper
+    if c.owns(old) and not c.dry_run:
+        if os.path.exists(old):
+            os.unlink(old)
+        c.state["owned"].remove(old)
+    for name in WALLPAPERS:
+        src, dest = os.path.join(paths.WALLPAPERS_SRC, name), os.path.join(d, name)
+        if os.path.isfile(dest) and fetch.sha256(dest) == fetch.sha256(src):
+            continue
+        c.log(f"  wallpaper {name}")
         if not c.dry_run:
-            _copy(fetch.get(pins.WALLPAPER_URL, pins.WALLPAPER_SHA), dest)
+            _copy(src, dest)
             c.own(dest)
     apply_setting(c.state, c.backend, "org.cinnamon.desktop.background", "picture-uri",
-                  "file://" + dest, c.dry_run, c.log)
+                  _wallpaper_uri(MODE_WALLPAPER[c.mode]), c.dry_run, c.log)
     apply_setting(c.state, c.backend, "org.cinnamon.desktop.background", "picture-options",
                   "zoom", c.dry_run, c.log)
+
+
+TERMINAL_PROFILE = "d0757aff-5e7a-4c1e-9d07-5a7aff000001"
+TERMINAL_PATH = f"/org/gnome/terminal/legacy/profiles:/:{TERMINAL_PROFILE}/"
+TERMINAL = {
+    "visible-name": "DotStuff",
+    "use-theme-colors": False,
+    "background-color": "rgb(0,0,0)",
+    "foreground-color": "rgb(170,170,170)",
+    "bold-color-same-as-fg": True,
+    "bold-color": "rgb(255,0,0)",
+    "bold-is-bright": True,
+    "cursor-colors-set": False,
+    "cursor-foreground-color": "rgb(196,0,0)",
+    "use-system-font": False,
+    "font": "Lettera Mono LL 11",
+}
+
+
+def terminal(c):
+    """A DotStuff profile for GNOME Terminal (black, grey text, Lettera Mono), made the default."""
+    lst = "org.gnome.Terminal.ProfilesList"
+    if not c.backend.has(lst, "list"):
+        c.log("  skip terminal (GNOME Terminal is not installed)")
+        return
+    schema = f"org.gnome.Terminal.Legacy.Profile:{TERMINAL_PATH}"
+    for key, value in TERMINAL.items():
+        apply_setting(c.state, c.backend, schema, key, value, c.dry_run, c.log)
+    profiles = list(c.backend.current(lst, "list"))
+    if TERMINAL_PROFILE not in profiles:
+        apply_setting(c.state, c.backend, lst, "list", profiles + [TERMINAL_PROFILE], c.dry_run, c.log)
+    apply_setting(c.state, c.backend, lst, "default", TERMINAL_PROFILE, c.dry_run, c.log)
 
 
 def _tree_digest(root):
@@ -166,12 +214,13 @@ def icon_theme_name(shape, mode):
 
 
 def set_mode(c):
-    """Switch between light and dark: theme, colour scheme and the matching icons.
+    """Switch between light and dark: theme, colour scheme, wallpaper and the matching icons.
     Desklets follow the theme by themselves; the lock screen stays dark."""
     name = THEME_NAMES[c.mode]
     if not os.path.isdir(os.path.join(paths.themes_dir(), name)):
         raise SystemExit(f"{name} is not installed; run ./install.sh --only theme first")
     apply_theme_settings(c, c.mode)
+    _switch_wallpaper(c)
     current = c.backend.current("org.cinnamon.desktop.interface", "icon-theme")
     if not current.startswith("Monotile-"):
         c.log(f"  icon theme {current} is not a Monotile theme; left as it is")
@@ -182,6 +231,17 @@ def set_mode(c):
         return
     for schema in ("org.cinnamon.desktop.interface", "org.gnome.desktop.interface"):
         apply_setting(c.state, c.backend, schema, "icon-theme", target, c.dry_run, c.log)
+
+
+def _switch_wallpaper(c):
+    """Follow the mode only while a DotStuff wallpaper is showing; a user's own choice stays."""
+    key = ("org.cinnamon.desktop.background", "picture-uri")
+    if not c.backend.has(*key):
+        return
+    ours = {_wallpaper_uri(n) for n in MODE_WALLPAPER.values()}
+    target = _wallpaper_uri(MODE_WALLPAPER[c.mode])
+    if c.backend.current(*key) in ours and os.path.exists(target[len("file://"):]):
+        apply_setting(c.state, c.backend, *key, target, c.dry_run, c.log)
 
 
 def cursor(c):
@@ -318,6 +378,7 @@ def reload_shell(c):
 
 
 ALL = [("fonts", fonts), ("wallpaper", wallpaper), ("theme", theme), ("cursor", cursor),
-       ("fontsettings", fontsettings), ("icons", icons), ("menu", menu), ("desklets", desklets)]
+       ("fontsettings", fontsettings), ("terminal", terminal), ("icons", icons), ("menu", menu),
+       ("desklets", desklets)]
 OPTIONAL = [("prompt", prompt)]
 STEP_NAMES = [n for n, _ in ALL + OPTIONAL]

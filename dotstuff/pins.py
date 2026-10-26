@@ -5,7 +5,6 @@ source at install time. See NOTICE.md for credits and terms.
 """
 
 NOTHINGFONT = "9d8b51d2e89fcf4d71f4d31e346a2b0ee4350716"   # github.com/xeji01/nothingfont
-PANACEA = "8636001404f720c7595eaaef6d59787cce8d9395"       # github.com/EnsixD/Panacea
 
 _FONT_URL = f"https://raw.githubusercontent.com/xeji01/nothingfont/{NOTHINGFONT}/fonts/"
 
@@ -32,10 +31,6 @@ JETBRAINS_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2
 JETBRAINS_SHA = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 JETBRAINS_FILES = ["JetBrainsMono-Regular.ttf", "JetBrainsMono-Medium.ttf",
                    "JetBrainsMono-Bold.ttf", "JetBrainsMono-Light.ttf"]
-
-# NothingWall, from the Panacea desktop by EnsixD (MIT)
-WALLPAPER_URL = f"https://raw.githubusercontent.com/EnsixD/Panacea/{PANACEA}/wallpapers/NothingWall.png"
-WALLPAPER_SHA = "2fdf347c1b9a22d3f9c728259940b7286d0a995400e498965aff663c7e5be75b"
 
 # AOSP Cursors by Tech-Tac (GPL-3.0), Android's cursor set for Linux
 CURSOR_URL = "https://github.com/Tech-Tac/aosp-cursors/releases/download/1.3.1/aosp-cursors-linux-1.3.1.tar.xz"

@@ -26,6 +26,10 @@ class FakeSettings:
             ("org.cinnamon.theme", "name"): "Mint-Y-Dark",
             ("org.gnome.desktop.interface", "color-scheme"): "default",
             ("org.cinnamon.desktop.interface", "icon-theme"): "Mint-Y",
+            ("org.cinnamon.desktop.background", "picture-uri"): "file:///usr/share/backgrounds/default.jpg",
+            ("org.cinnamon.desktop.background", "picture-options"): "zoom",
+            ("org.gnome.Terminal.ProfilesList", "list"): ["b1dcc9dd-5262-4d8d-a863-c897e6d979b9"],
+            ("org.gnome.Terminal.ProfilesList", "default"): "b1dcc9dd-5262-4d8d-a863-c897e6d979b9",
             ("org.cinnamon.desktop.interface", "cursor-size"): 24,
             ("org.cinnamon", "enabled-desklets"): [],
             ("org.cinnamon", "next-desklet-id"): 0,
@@ -235,6 +239,44 @@ class Steps(Isolated):
         self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle")
         self.assertEqual(b.current("org.cinnamon.theme", "name"), "Mint-Y-Dark")
 
+    def test_terminal_profile_added_default_and_restored(self):
+        b = FakeSettings()
+        prof = f"org.gnome.Terminal.Legacy.Profile:{steps.TERMINAL_PATH}"
+        for k in steps.TERMINAL:
+            b.defaults[(prof, k)] = None
+        c = self.ctx(b)
+        steps.terminal(c)
+        self.assertEqual(b.current(prof, "font"), "Lettera Mono LL 11")
+        self.assertEqual(b.current(prof, "background-color"), "rgb(0,0,0)")
+        self.assertEqual(b.current("org.gnome.Terminal.ProfilesList", "default"), steps.TERMINAL_PROFILE)
+        self.assertIn(steps.TERMINAL_PROFILE, b.current("org.gnome.Terminal.ProfilesList", "list"))
+        save_state(c.state)
+        restore(b, log=self.logs.append)
+        self.assertEqual(b.user, {})                            # profile and list back to how they were
+
+    def test_terminal_skipped_without_gnome_terminal(self):
+        b = FakeSettings()
+        del b.defaults[("org.gnome.Terminal.ProfilesList", "list")]
+        steps.terminal(self.ctx(b))
+        self.assertEqual(b.user, {})
+
+    def test_wallpaper_follows_mode_unless_user_changed_it(self):
+        b = FakeSettings()
+        c = self.ctx(b)
+        steps.wallpaper(c)
+        steps.theme(c)
+        uri = ("org.cinnamon.desktop.background", "picture-uri")
+        self.assertTrue(b.current(*uri).endswith("NothingWallpaper-1.jpg"))
+        for n in steps.WALLPAPERS:
+            self.assertTrue(os.path.isfile(os.path.join(paths.wallpapers_dir(), n)))
+        c.mode = "light"
+        steps.set_mode(c)
+        self.assertTrue(b.current(*uri).endswith("NothingWallpaper-2.png"))
+        b.set(*uri, "file:///home/me/cat.jpg")
+        c.mode = "dark"
+        steps.set_mode(c)
+        self.assertEqual(b.current(*uri), "file:///home/me/cat.jpg")
+
     def test_mode_needs_installed_theme(self):
         c = self.ctx(FakeSettings(), mode="light")
         with self.assertRaises(SystemExit):
@@ -274,7 +316,7 @@ class Steps(Isolated):
 
     def test_pins_are_complete(self):
         self.assertEqual(set(pins.FONTS), set(pins.FONT_URLS))
-        for sha in list(pins.FONTS.values()) + [pins.WALLPAPER_SHA, pins.CURSOR_SHA, pins.JETBRAINS_SHA]:
+        for sha in list(pins.FONTS.values()) + [pins.CURSOR_SHA, pins.JETBRAINS_SHA]:
             self.assertRegex(sha, r"^[0-9a-f]{64}$")
 
 

@@ -22,12 +22,14 @@ class GioSettings:
         self._cache = {}
 
     def _s(self, schema):
+        """`schema` is a schema id, or "id:/path/" for a relocatable schema (terminal profiles)."""
         if schema not in self._cache:
-            self._cache[schema] = self.Gio.Settings.new(schema)
+            sid, _, path = schema.partition(":")
+            self._cache[schema] = self.Gio.Settings.new_with_path(sid, path) if path else self.Gio.Settings.new(sid)
         return self._cache[schema]
 
     def has(self, schema, key):
-        sc = self.source.lookup(schema, True)
+        sc = self.source.lookup(schema.partition(":")[0], True)
         return bool(sc and sc.has_key(key))
 
     def get(self, schema, key):

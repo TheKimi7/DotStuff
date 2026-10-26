@@ -38,6 +38,6 @@ CURSOR_SHA = "d271d2be20a6d7ac13747e4d9224a28ddbf7e2c1fab2e805cdf03bde05a0a3ae"
 CURSOR_DIR = "aosp-cursors"
 
 # monotile, the icon generator (GPL-3.0); update with tools/pin_monotile.py after pushing monotile
-MONOTILE_COMMIT = "6d664e6d25d8af9f28614cafd935e2d195668df3"
-MONOTILE_SHA = "776f282bebb9a791dcfe7816ebf40f871e3259caaa10b48e32646009b8530b0e"
+MONOTILE_COMMIT = "cce8784dd45c226a90a1c86b26be03a362b76c51"
+MONOTILE_SHA = "1b45ed11de812ab818347961564f8de5cc5d195ca4b61ff3994f8cd98db04b5a"
 MONOTILE_URL = f"https://github.com/TheKimi7/monotile/archive/{MONOTILE_COMMIT}.tar.gz"

@@ -7,6 +7,6 @@ Encoding=UTF-8
 [X-GNOME-Metatheme]
 GtkTheme=DotStuff-Light
 MetacityTheme=DotStuff-Light
-IconTheme=Monotile-Light-Circle
+IconTheme=Monotile-Circle-Light
 CursorTheme=aosp-cursors
 ButtonLayout=close,minimize,maximize:menu

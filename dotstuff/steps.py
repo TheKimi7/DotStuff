@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 from . import fetch, paths, pins
+from . import monotile as mt
 from .settings import apply_setting, remember_file
 
 MARKER = ".dotstuff"
@@ -40,9 +41,9 @@ def _copy(src, dest):
     os.replace(dest + ".tmp", dest)
 
 
-def _monotile(*args, check=True):
-    env = dict(os.environ, PYTHONPATH=paths.MONOTILE)
-    return subprocess.run([sys.executable, "-m", "monotile", *args], env=env, check=check)
+def _monotile(*args, check=True, **kw):
+    env = dict(os.environ, PYTHONPATH=mt.location())
+    return subprocess.run([sys.executable, "-m", "monotile", *args], env=env, check=check, **kw)
 
 
 # ---------------------------------------------------------------- steps
@@ -120,10 +121,9 @@ def wallpaper(c):
                   "zoom", c.dry_run, c.log)
 
 
-TERMINAL_PROFILE = "d0757aff-5e7a-4c1e-9d07-5a7aff000001"
-TERMINAL_PATH = f"/org/gnome/terminal/legacy/profiles:/:{TERMINAL_PROFILE}/"
+TERMINAL_PROFILES = {"dark": "d0757aff-5e7a-4c1e-9d07-5a7aff000001",
+                     "light": "d0757aff-5e7a-4c1e-9d07-5a7aff000002"}
 TERMINAL = {
-    "visible-name": "DotStuff",
     "use-theme-colors": False,
     "bold-color-same-as-fg": True,
     "bold-color": "rgb(255,0,0)",
@@ -134,31 +134,39 @@ TERMINAL = {
     "font": "Lettera Mono LL 11",
 }
 TERMINAL_COLOURS = {
-    "dark": {"background-color": "rgb(0,0,0)", "foreground-color": "rgb(170,170,170)"},
-    "light": {"background-color": "rgb(242,242,242)", "foreground-color": "rgb(51,51,51)"},
+    "dark": {"visible-name": "DotStuff Dark", "background-color": "rgb(0,0,0)",
+             "foreground-color": "rgb(170,170,170)"},
+    "light": {"visible-name": "DotStuff Light", "background-color": "rgb(242,242,242)",
+              "foreground-color": "rgb(51,51,51)"},
 }
-TERMINAL_SCHEMA = f"org.gnome.Terminal.Legacy.Profile:{TERMINAL_PATH}"
 PROFILES = "org.gnome.Terminal.ProfilesList"
 
 
+def terminal_schema(mode):
+    return f"org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:{TERMINAL_PROFILES[mode]}/"
+
+
 def terminal(c):
-    """A DotStuff profile for GNOME Terminal (Lettera Mono, grey on black or dark grey on
-    light grey), made the default. Other terminals are left alone."""
+    """Two GNOME Terminal profiles, DotStuff Dark and DotStuff Light (Lettera Mono, grey on
+    black or dark grey on light grey); the one for the current mode becomes the default.
+    Other terminals are left alone."""
     if not c.backend.has(PROFILES, "list"):
         c.log("  skip terminal: GNOME Terminal is not installed (other terminals keep their own colours)")
         return
-    for key, value in dict(TERMINAL, **TERMINAL_COLOURS[c.mode]).items():
-        apply_setting(c.state, c.backend, TERMINAL_SCHEMA, key, value, c.dry_run, c.log)
+    for mode in TERMINAL_PROFILES:
+        for key, value in dict(TERMINAL, **TERMINAL_COLOURS[mode]).items():
+            apply_setting(c.state, c.backend, terminal_schema(mode), key, value, c.dry_run, c.log)
     profiles = list(c.backend.current(PROFILES, "list"))
-    if TERMINAL_PROFILE not in profiles:
-        apply_setting(c.state, c.backend, PROFILES, "list", profiles + [TERMINAL_PROFILE], c.dry_run, c.log)
-    apply_setting(c.state, c.backend, PROFILES, "default", TERMINAL_PROFILE, c.dry_run, c.log)
+    missing = [p for p in TERMINAL_PROFILES.values() if p not in profiles]
+    if missing:
+        apply_setting(c.state, c.backend, PROFILES, "list", profiles + missing, c.dry_run, c.log)
+    apply_setting(c.state, c.backend, PROFILES, "default", TERMINAL_PROFILES[c.mode], c.dry_run, c.log)
 
 
 def _terminal_mode(c):
-    if c.backend.has(PROFILES, "list") and TERMINAL_PROFILE in c.backend.current(PROFILES, "list"):
-        for key, value in TERMINAL_COLOURS[c.mode].items():
-            apply_setting(c.state, c.backend, TERMINAL_SCHEMA, key, value, c.dry_run, c.log)
+    """Switch the default profile, but only away from a DotStuff one (a user's choice stays)."""
+    if c.backend.has(PROFILES, "default") and c.backend.current(PROFILES, "default") in TERMINAL_PROFILES.values():
+        apply_setting(c.state, c.backend, PROFILES, "default", TERMINAL_PROFILES[c.mode], c.dry_run, c.log)
 
 
 GTK4_FILES = ("gtk.css", "gtk-dark.css", "assets")
@@ -248,8 +256,8 @@ def apply_theme_settings(c, mode):
 
 
 def icon_theme_name(shape, mode):
-    """Monotile-Circle, Monotile-Light-Squircle, ..."""
-    return "Monotile-" + ("Light-" if mode == "light" else "") + shape.capitalize()
+    """Monotile-Circle-Dark, Monotile-Squircle-Light, ..."""
+    return f"Monotile-{shape.capitalize()}-{mode.capitalize()}"
 
 
 def set_mode(c):
@@ -265,7 +273,7 @@ def set_mode(c):
     if not current.startswith("Monotile-"):
         c.log(f"  icon theme {current} is not a Monotile theme; left as it is")
         return
-    target = icon_theme_name("squircle" if current.endswith("Squircle") else "circle", c.mode)
+    target = icon_theme_name("squircle" if "Squircle" in current else "circle", c.mode)
     if not os.path.isdir(os.path.join(paths.icons_dir(), target)):
         c.log(f"  {target} not generated yet; run ./install.sh --only icons")
         return
@@ -316,24 +324,24 @@ def icons(c):
     mcfg = os.path.join(P.config_home(), "monotile")
     _container(c, mcfg)                    # monotile's settings folder, if DotStuff creates it
     name = icon_theme_name(c.shape, c.mode)
-    c.log(f"  icons Monotile-Circle, -Squircle and their Light versions (applying {name})")
-    _monotile("generate", "--shape", c.shape, *(["--dry-run"] if c.dry_run else []))
+    c.log(f"  icons Monotile-Circle and Monotile-Squircle, -Dark and -Light (applying {name})")
+    if mt.ensure(c):
+        _monotile("generate", "--shape", c.shape, *(["--dry-run"] if c.dry_run else []))
+    else:
+        c.log("  (monotile is downloaded first, then about 10,000 icons are converted)")
     for schema in ("org.cinnamon.desktop.interface", "org.gnome.desktop.interface"):
         apply_setting(c.state, c.backend, schema, "icon-theme", name, c.dry_run, c.log)
     if c.dry_run:
         return
-    env = dict(os.environ, PYTHONPATH=paths.MONOTILE)
-    status = subprocess.run([sys.executable, "-m", "monotile", "watch", "status"], env=env,
-                            capture_output=True, text=True).stdout.strip()
+    status = _monotile("watch", "status", check=False, capture_output=True, text=True).stdout.strip()
     if status == "active":
         return
-    r = subprocess.run([sys.executable, "-m", "monotile", "watch", "enable"], env=env,
-                       capture_output=True, text=True)
+    r = _monotile("watch", "enable", check=False, capture_output=True, text=True)
     if r.returncode == 0:
         c.state["watcher"] = True
         c.log("  icon watcher on: new apps get monochrome icons automatically")
     else:
-        c.log("  icon watcher not enabled (no systemd user session); run `vendor/monotile/run-monotile watch enable` later")
+        c.log("  icon watcher not enabled (no systemd user session); run `~/.local/share/dotstuff/monotile/run-monotile watch enable` later")
 
 
 MENU_ICON = "dotstuff-menu-symbolic"     # symbolic: the panel's text colour paints it, the centre stays red
@@ -383,7 +391,7 @@ def desklets(c):
         c.log("  desklets Mono Clock, Date, Weather, System, Day")
     if c.dry_run:
         return
-    subprocess.run(["bash", os.path.join(paths.MONOTILE, "desklets", "install.sh")], check=True,
+    subprocess.run(["bash", os.path.join(mt.ensure(c), "desklets", "install.sh")], check=True,
                    stdout=subprocess.DEVNULL)
     for u in new:
         c.own(os.path.join(root, u))

@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 
+from . import monotile as mt
 from . import paths
 from .settings import UNSET, load_state, state_path
 from .steps import PROMPT_BEGIN, PROMPT_END
@@ -74,15 +75,18 @@ def restore(backend, purge=False, log=print):
                 backend.reset("org.cinnamon", "next-desklet-id")
             log(f"  removed {len(current) - len(keep)} DotStuff desklets from the desktop")
 
-    env = dict(os.environ, PYTHONPATH=paths.MONOTILE)
-    if state.get("watcher"):
+    env = dict(os.environ, PYTHONPATH=mt.location())
+    if not mt.installed():
+        log("  monotile is no longer installed; its icon themes and watcher were left as they are")
+    elif state.get("watcher"):
         subprocess.run([sys.executable, "-m", "monotile", "watch", "disable"], env=env, check=False)
         log("  stopped the icon watcher")
 
-    if purge:
+    if purge and mt.installed():
         subprocess.run([sys.executable, "-c",
                         "from monotile import config, theme; theme.remove_all(config.load())"],
                        env=env, check=False)
+    if purge:
         for p in sorted(state["owned"], key=len, reverse=True):     # files before their folders
             if os.path.isdir(p) and not os.path.islink(p):
                 shutil.rmtree(p, ignore_errors=True)

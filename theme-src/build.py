@@ -206,7 +206,7 @@ def build_variant(src, out_dir, mode):
         f"Comment=Nothing / Android style {mode} theme for Cinnamon, built from Orchis by vinceliuice (GPL-3.0)\n"
         "Encoding=UTF-8\n\n[X-GNOME-Metatheme]\n"
         f"GtkTheme={name}\nMetacityTheme={name}\n"
-        f"IconTheme=Monotile-{'Circle' if dark else 'Light-Circle'}\nCursorTheme=aosp-cursors\n"
+        f"IconTheme=Monotile-Circle-{'Dark' if dark else 'Light'}\nCursorTheme=aosp-cursors\n"
         "ButtonLayout=close,minimize,maximize:menu\n")
     shutil.copy(os.path.join(os.path.dirname(src), "COPYING"), t)
     return t

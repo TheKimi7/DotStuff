@@ -12,11 +12,11 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dotstuff import fetch, paths, pins, steps  # noqa: E402
+from dotstuff import fetch, monotile, paths, pins, steps  # noqa: E402
 from dotstuff.restore import restore  # noqa: E402
 from dotstuff.settings import UNSET, load_state, save_state  # noqa: E402
 
-VARS = ("HOME", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "DOTSTUFF_CACHE")
+VARS = ("HOME", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "DOTSTUFF_CACHE", "DOTSTUFF_MONOTILE")
 
 
 class FakeSettings:
@@ -65,6 +65,7 @@ class Isolated(unittest.TestCase):
                           XDG_CONFIG_HOME=os.path.join(home, ".config"),
                           XDG_CACHE_HOME=os.path.join(home, ".cache"))
         os.environ.pop("DOTSTUFF_CACHE", None)
+        os.environ.pop("DOTSTUFF_MONOTILE", None)
         os.makedirs(home)
         self.logs = []
 
@@ -232,44 +233,59 @@ class Steps(Isolated):
         self.assertNotIn(old, c.state["owned"])
 
     def test_mode_switches_theme_icons_and_back(self):
-        b = FakeSettings(user={("org.cinnamon.desktop.interface", "icon-theme"): "Monotile-Squircle"})
+        b = FakeSettings(user={("org.cinnamon.desktop.interface", "icon-theme"): "Monotile-Squircle-Dark"})
         c = self.ctx(b)
         steps.theme(c)
-        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Light-Squircle"))
-        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Squircle"))
+        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Squircle-Light"))
+        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Squircle-Dark"))
         c.mode = "light"
         steps.set_mode(c)
         self.assertEqual(b.current("org.cinnamon.theme", "name"), "DotStuff-Light")
         self.assertEqual(b.current("org.gnome.desktop.interface", "color-scheme"), "prefer-light")
         self.assertEqual(b.current("org.x.apps.portal", "color-scheme"), "prefer-light")
-        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Light-Squircle")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle-Light")
         c.mode = "dark"
         steps.set_mode(c)
         self.assertEqual(b.current("org.cinnamon.theme", "name"), "DotStuff-Dark")
-        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle-Dark")
         save_state(c.state)
         restore(b, log=self.logs.append)                  # originals survive any number of switches
-        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle-Dark")
         self.assertEqual(b.current("org.cinnamon.theme", "name"), "Mint-Y-Dark")
 
-    def test_terminal_profile_added_default_and_restored(self):
+    def test_terminal_profiles_added_switched_and_restored(self):
         b = FakeSettings()
-        prof = f"org.gnome.Terminal.Legacy.Profile:{steps.TERMINAL_PATH}"
-        for k in list(steps.TERMINAL) + list(steps.TERMINAL_COLOURS["dark"]):
-            b.defaults[(prof, k)] = None
+        lst = "org.gnome.Terminal.ProfilesList"
+        for mode in steps.TERMINAL_PROFILES:
+            for k in list(steps.TERMINAL) + list(steps.TERMINAL_COLOURS[mode]):
+                b.defaults[(steps.terminal_schema(mode), k)] = None
         c = self.ctx(b)
         steps.terminal(c)
-        self.assertEqual(b.current(prof, "font"), "Lettera Mono LL 11")
-        self.assertEqual(b.current(prof, "background-color"), "rgb(0,0,0)")
-        self.assertEqual(b.current("org.gnome.Terminal.ProfilesList", "default"), steps.TERMINAL_PROFILE)
-        self.assertIn(steps.TERMINAL_PROFILE, b.current("org.gnome.Terminal.ProfilesList", "list"))
+        dark, light = steps.terminal_schema("dark"), steps.terminal_schema("light")
+        self.assertEqual(b.current(dark, "font"), "Lettera Mono LL 11")
+        self.assertEqual((b.current(dark, "visible-name"), b.current(dark, "background-color")), ("DotStuff Dark", "rgb(0,0,0)"))
+        self.assertEqual((b.current(light, "visible-name"), b.current(light, "background-color")), ("DotStuff Light", "rgb(242,242,242)"))
+        self.assertEqual(b.current(lst, "default"), steps.TERMINAL_PROFILES["dark"])
+        for p in steps.TERMINAL_PROFILES.values():
+            self.assertIn(p, b.current(lst, "list"))
         steps.theme(c)
         c.mode = "light"
         steps.set_mode(c)
-        self.assertEqual(b.current(prof, "background-color"), "rgb(242,242,242)")
+        self.assertEqual(b.current(lst, "default"), steps.TERMINAL_PROFILES["light"])
+        self.assertEqual(b.current(dark, "background-color"), "rgb(0,0,0)")     # profiles are never edited
         save_state(c.state)
         restore(b, log=self.logs.append)
-        self.assertEqual(b.user, {})                            # profile and list back to how they were
+        self.assertEqual(b.user, {})                            # profiles and list back to how they were
+
+    def test_mode_keeps_a_terminal_profile_the_user_chose(self):
+        b = FakeSettings()
+        c = self.ctx(b)
+        steps.terminal(c)
+        steps.theme(c)
+        b.set("org.gnome.Terminal.ProfilesList", "default", "my-own-profile")
+        c.mode = "light"
+        steps.set_mode(c)
+        self.assertEqual(b.current("org.gnome.Terminal.ProfilesList", "default"), "my-own-profile")
 
     def test_gtk4_links_follow_mode_and_are_removed(self):
         c = self.ctx(FakeSettings())
@@ -347,6 +363,11 @@ class Steps(Isolated):
     def test_restore_removes_only_dotstuff_desklets(self):
         b = FakeSettings(user={("org.cinnamon", "enabled-desklets"): ["clock@cinnamon.org:0:100:100"],
                                ("org.cinnamon", "next-desklet-id"): 1})
+        fake = os.path.join(self.root, "monotile")              # stand-in for the downloaded monotile
+        os.makedirs(os.path.join(fake, "desklets"))
+        with open(os.path.join(fake, "desklets", "install.sh"), "w") as f:
+            f.write("".join(f'mkdir -p "$XDG_DATA_HOME/cinnamon/desklets/{u}"\n' for u, _, _ in steps.DESKLET_LAYOUT))
+        os.environ["DOTSTUFF_MONOTILE"] = fake
         c = self.ctx(b)
         steps.desklets(c)
         save_state(c.state)
@@ -355,9 +376,38 @@ class Steps(Isolated):
         self.assertEqual(b.current("org.cinnamon", "enabled-desklets"), ["clock@cinnamon.org:0:100:100"])
         self.assertFalse(os.path.exists(os.path.join(paths.data_home(), "cinnamon/desklets/mono-clock@monotile")))
 
+    def test_monotile_downloaded_once_and_kept_outside_the_repo(self):
+        commit = "a" * 40
+        top = f"monotile-{commit}"
+        archive = os.path.join(self.root, "src.tar.gz")
+        with tarfile.open(archive, "w:gz") as t:
+            for name, data in ((f"{top}/monotile/__init__.py", b""), (f"{top}/desklets/install.sh", b"true")):
+                ti = tarfile.TarInfo(name)
+                ti.size = len(data)
+                t.addfile(ti, io.BytesIO(data))
+        cache = os.path.join(self.root, "cache")
+        os.makedirs(cache)
+        shutil.copy(archive, os.path.join(cache, f"monotile-{commit}.tar.gz"))
+        os.environ["DOTSTUFF_CACHE"] = cache
+        saved = (pins.MONOTILE_COMMIT, pins.MONOTILE_SHA)
+        pins.MONOTILE_COMMIT, pins.MONOTILE_SHA = commit, fetch.sha256(archive)
+        try:
+            c = self.ctx(FakeSettings())
+            where = monotile.ensure(c)
+            self.assertEqual(where, os.path.join(paths.state_dir(), "monotile"))
+            self.assertTrue(monotile.installed())
+            self.assertIn(where, c.state["owned"])
+            self.logs.clear()
+            self.assertEqual(monotile.ensure(c), where)
+            self.assertEqual(self.logs, [])                      # already there: no second download
+            os.environ["DOTSTUFF_MONOTILE"] = "/some/checkout"
+            self.assertEqual(monotile.ensure(c), "/some/checkout")
+        finally:
+            pins.MONOTILE_COMMIT, pins.MONOTILE_SHA = saved
+
     def test_pins_are_complete(self):
         self.assertEqual(set(pins.FONTS), set(pins.FONT_URLS))
-        for sha in list(pins.FONTS.values()) + [pins.CURSOR_SHA, pins.JETBRAINS_SHA]:
+        for sha in list(pins.FONTS.values()) + [pins.CURSOR_SHA, pins.JETBRAINS_SHA, pins.MONOTILE_SHA]:
             self.assertRegex(sha, r"^[0-9a-f]{64}$")
 
 

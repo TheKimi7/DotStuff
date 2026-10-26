@@ -5,7 +5,6 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 THEMES_SRC = os.path.join(REPO, "theme")            # DotStuff-Dark, DotStuff-Light
 WALLPAPERS_SRC = os.path.join(REPO, "wallpapers")
 MENU_ICON_SRC = os.path.join(REPO, "assets", "dotstuff-menu-symbolic.svg")
-MONOTILE = os.path.join(REPO, "vendor", "monotile")
 
 
 def _xdg(var, default):

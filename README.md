@@ -3,11 +3,12 @@
 **A Nothing-inspired black, white and red desktop for Linux Mint and other Cinnamon desktops,
 installed and configured with one script, and undone with one more.**
 
-![Monochrome app icons, circle tiles](vendor/monotile/docs/demo-circle.png)
+| Dark | Light |
+|---|---|
+| ![Monotile-Circle-Dark](https://raw.githubusercontent.com/TheKimi7/monotile/main/docs/demo-circle-dark.png) | ![Monotile-Circle-Light](https://raw.githubusercontent.com/TheKimi7/monotile/main/docs/demo-circle-light.png) |
+| ![Monotile-Squircle-Dark](https://raw.githubusercontent.com/TheKimi7/monotile/main/docs/demo-squircle-dark.png) | ![Monotile-Squircle-Light](https://raw.githubusercontent.com/TheKimi7/monotile/main/docs/demo-squircle-light.png) |
 
-![Light mode icons](vendor/monotile/docs/demo-light.png)
-
-![Folders, file types and devices](vendor/monotile/docs/demo-system.png)
+![Folders, file types and devices](https://raw.githubusercontent.com/TheKimi7/monotile/main/docs/demo-system.png)
 
 > Unofficial fan project, not affiliated with or endorsed by Nothing Technology Limited.
 > See [NOTICE.md](NOTICE.md) for credits.
@@ -17,14 +18,14 @@ installed and configured with one script, and undone with one more.**
 | Part | Details |
 |---|---|
 | **DotStuff-Dark and DotStuff-Light themes** | Android / Nothing OS look in a fixed charcoal or white palette with Nothing red: pill buttons and text fields, Material 3 switches, rounded cards, menus and dialogs, pill tabs. Black (or white) panel, bold NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Built from [Orchis](https://github.com/vinceliuice/Orchis-theme). |
-| **Light and dark mode** | `./install.sh mode light` / `./install.sh mode dark` switches the theme, icons, desktop widgets, wallpaper and terminal colours together. The lock screen stays dark. |
+| **Light and dark mode** | `./install.sh mode light` / `./install.sh mode dark` switches the theme, icons, desktop widgets, wallpaper and terminal profile together. The lock screen stays dark. |
 | **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
-| **Monochrome icons** | Icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**, plus **Monotile-Light-Circle** and **Monotile-Light-Squircle** for light mode (black symbol on a light-grey tile). Every app, settings and session icon becomes a white stencil on a dark tile; folders are black and file types greyscale; devices and coloured status icons become white line art. New apps are converted automatically. No other icon theme is needed: monotile includes the icons it starts from. |
+| **Monochrome icons** | Icon themes made by [monotile](https://github.com/TheKimi7/monotile), downloaded during the install: **Monotile-Circle-Dark** and **Monotile-Squircle-Dark**, plus **Monotile-Circle-Light** and **Monotile-Squircle-Light** for light mode (black symbol on a light-grey tile). Every app, settings and session icon becomes a white stencil on a dark tile; folders are black and file types greyscale; devices and coloured status icons become white line art. New apps are converted automatically. No other icon theme is needed: monotile includes the icons it starts from. |
 | **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. They follow light and dark mode. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |
 | **Wallpapers** | Three Nothing wallpapers: a dark one by default, its light version in light mode, and one more dark one to pick in *Backgrounds*. |
-| **Terminal** | A DotStuff profile for GNOME Terminal (the default terminal on Linux Mint), made the default: Lettera Mono LL 11, grey text on black (dark grey on light grey in light mode). Your other profiles stay; other terminals are left alone. |
+| **Terminal** | Two GNOME Terminal profiles (GNOME Terminal is Linux Mint's default terminal): **DotStuff Dark** (grey text on black) and **DotStuff Light** (dark grey on light grey), both in Lettera Mono LL 11. The one for the current mode is the default; your own profiles stay, and other terminals are left alone. |
 | **Menu button** | A white disc (black in light mode) with a red centre dot. |
 | **Bash prompt** (optional) | White `user@host`, red path. |
 
@@ -77,13 +78,13 @@ existing AOSP cursor install, or a menu button with your own custom icon) are le
 | Setting | Value |
 |---|---|
 | Applications, desktop (panel) and window-border theme | DotStuff-Dark (or DotStuff-Light) |
-| Icon theme | Monotile-Circle or Monotile-Squircle (Light versions in light mode) |
+| Icon theme | Monotile-Circle-Dark or Monotile-Squircle-Dark (the -Light versions in light mode) |
 | Cursor | aosp-cursors, size 18 |
 | Window title font / desktop icon font | Ndot57Caps 12 / Ndot55Caps 10 |
 | Font smoothing | RGBA anti-aliasing, slight hinting |
 | Lock screen fonts (time / date / messages) | Ndot 57 112 / Ndot57Caps 22 / NType 82 14 |
 | Wallpaper | NothingWallpaper-1 (NothingWallpaper-2 in light mode), zoom |
-| GNOME Terminal default profile | DotStuff (Lettera Mono LL 11, dark or light colours) |
+| GNOME Terminal default profile | DotStuff Dark (DotStuff Light in light mode) |
 | Colour scheme (GTK4, Electron and Firefox apps) | prefer dark (prefer light in light mode) |
 | `~/.config/gtk-4.0` | links to the DotStuff theme so libadwaita apps use it (skipped if you have your own files there) |
 | Desklets | Mono Date, Clock, Weather, System, Day at the top left |
@@ -107,7 +108,7 @@ Your normal application font is not changed.
     Electron apps and clipboard managers do this. Those keep their own colours, so they may not
     switch between light and dark.
 - Some windows (browser web apps, some Electron apps) show their own runtime icon in the panel
-  instead of the themed one. See the [monotile README](vendor/monotile/README.md#limitations).
+  instead of the themed one. See the [monotile README](https://github.com/TheKimi7/monotile#limitations).
 - Desktop widgets are placed at the top left of the main screen for a 1080p-sized desktop; drag
   them anywhere afterwards.
 - The weather desklet uses [wttr.in](https://wttr.in); everything else works offline.
@@ -115,20 +116,25 @@ Your normal application font is not changed.
 ## Light and dark
 
 ```sh
-./install.sh mode light    # DotStuff-Light, Monotile-Light icons, white desklet cards, light wallpaper
+./install.sh mode light    # DotStuff-Light, Monotile -Light icons, white desklet cards, light wallpaper
 ./install.sh mode dark     # back to black
 ```
 
 Your tile shape is kept, the desklets switch by themselves, the wallpaper only switches if it
-is a DotStuff one, the terminal switches too, the lock screen stays dark, and `--restore` still puts back
+is a DotStuff one, new terminal windows use the DotStuff Light or Dark profile (unless you picked another default), the lock screen stays dark, and `--restore` still puts back
 whatever you had before DotStuff, however often you switch.
 
 ## Development
 
 ```sh
-python3 -m unittest discover -s tests                                  # DotStuff
-(cd vendor/monotile && PYTHONPATH=. python3 -m unittest discover -s tests)   # monotile
+python3 -m unittest discover -s tests          # DotStuff
 ```
+
+monotile is its own project ([TheKimi7/monotile](https://github.com/TheKimi7/monotile)). The
+installer downloads the commit pinned in `dotstuff/pins.py` into `~/.local/share/dotstuff/monotile`.
+After pushing a monotile change, pin it with `python3 tools/pin_monotile.py <commit>` (default:
+`main`). To try an unpushed monotile, point the installer at your checkout:
+`DOTSTUFF_MONOTILE=~/path/to/monotile ./install.sh`.
 
 The themes in `theme/` are built from Orchis's source (the pinned tag in `theme-src/build.py`)
 with `python3 theme-src/build.py /path/to/Orchis-theme` (needs the `libsass` Python package);

@@ -36,3 +36,8 @@ JETBRAINS_FILES = ["JetBrainsMono-Regular.ttf", "JetBrainsMono-Medium.ttf",
 CURSOR_URL = "https://github.com/Tech-Tac/aosp-cursors/releases/download/1.3.1/aosp-cursors-linux-1.3.1.tar.xz"
 CURSOR_SHA = "d271d2be20a6d7ac13747e4d9224a28ddbf7e2c1fab2e805cdf03bde05a0a3ae"
 CURSOR_DIR = "aosp-cursors"
+
+# monotile, the icon generator (GPL-3.0); update with tools/pin_monotile.py after pushing monotile
+MONOTILE_COMMIT = "6d664e6d25d8af9f28614cafd935e2d195668df3"
+MONOTILE_SHA = "776f282bebb9a791dcfe7816ebf40f871e3259caaa10b48e32646009b8530b0e"
+MONOTILE_URL = f"https://github.com/TheKimi7/monotile/archive/{MONOTILE_COMMIT}.tar.gz"

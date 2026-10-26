@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=DotStuff-Light
+Comment=Nothing / Android style light theme for Cinnamon, built from Orchis by vinceliuice (GPL-3.0)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=DotStuff-Light
+MetacityTheme=DotStuff-Light
+IconTheme=Monotile-Light-Circle
+CursorTheme=aosp-cursors
+ButtonLayout=close,minimize,maximize:menu

@@ -1,0 +1,82 @@
+
+/* ===== DotStuff: Android / Nothing OS layer (GTK3) =====
+   Colours come from the @ds_* tokens defined per variant by build.py.
+   Fixed palette, no dynamic colour. */
+
+/* -- surfaces: the window is the flat background, content sits on cards -- */
+window.background, .background { background-color: @ds_bg; color: @ds_fg; }
+headerbar, .titlebar, .titlebar:backdrop, headerbar:backdrop {
+    background-color: @ds_bg; background-image: none; box-shadow: none; border-color: transparent; color: @ds_fg; }
+headerbar .title { font-weight: bold; }
+
+/* -- buttons: pills -- */
+button.text-button, button.image-button.text-button, button.suggested-action, button.destructive-action,
+dialog .dialog-action-area button, messagedialog .dialog-action-box button {
+    border-radius: 999px; padding: 6px 18px; }
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):not(:checked):not(:disabled) {
+    background-color: @ds_button; background-image: none; border-color: transparent; box-shadow: none; color: @ds_fg; }
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):hover { background-color: shade(@ds_button, @ds_hover_shade); }
+button:not(.flat):not(.titlebutton):not(.suggested-action):not(.destructive-action):active, button:not(.flat):not(.suggested-action):not(.destructive-action):checked {
+    background-color: shade(@ds_button, @ds_press_shade); }
+button.suggested-action:not(:disabled) {
+    background-color: @ds_accent; background-image: none; color: #ffffff; border-color: transparent; box-shadow: none; }
+button.suggested-action:not(:disabled):hover { background-color: shade(@ds_accent, 1.1); }
+button.destructive-action:not(:disabled) { background-color: transparent; background-image: none; color: @ds_accent;
+    border: 1px solid @ds_accent; box-shadow: none; }
+button.destructive-action:not(:disabled):hover { background-color: alpha(@ds_accent, 0.1); }
+button.flat:hover { background-color: @ds_hover; }
+button.flat:active, button.flat:checked { background-color: @ds_press; }
+button.circular, button.titlebutton { border-radius: 999px; }
+
+/* -- text fields: pills, filled -- */
+entry { border-radius: 999px; padding-left: 14px; padding-right: 14px; background-color: @ds_card;
+    background-image: none; border: 1px solid @ds_outline; box-shadow: none; color: @ds_fg; }
+entry:focus { border-color: @ds_fg; box-shadow: none; }
+textview text, textview { background-color: @ds_card; }
+
+/* -- Material 3 switch: thick track, round thumb that grows when on -- */
+switch { min-width: 48px; min-height: 26px; border-radius: 999px; padding: 0;
+    background-color: @ds_button; background-image: none; border: 2px solid @ds_outline_strong;
+    box-shadow: none; font-size: 0; color: transparent; }
+switch slider { min-width: 14px; min-height: 14px; margin: 4px; border-radius: 999px;
+    background-color: @ds_fg_dim; background-image: none; border: none; box-shadow: none; }
+switch:checked { background-color: @ds_accent; border-color: @ds_accent; }
+switch:checked slider { min-width: 20px; min-height: 20px; margin: 1px; background-color: #ffffff; }
+switch:disabled { opacity: 0.4; }
+
+/* -- sliders and progress: thick rounded tracks -- */
+scale trough, progressbar trough { min-height: 6px; min-width: 6px; border-radius: 999px;
+    background-color: @ds_button; border: none; }
+scale highlight, progressbar progress { border-radius: 999px; background-color: @ds_accent; border: none; }
+scale slider { min-width: 18px; min-height: 18px; border-radius: 999px; background-color: @ds_accent;
+    background-image: none; border: none; box-shadow: none; }
+
+/* -- lists and settings rows: rounded cards -- */
+list, listbox { background-color: transparent; }
+frame > list, frame > listbox, .boxed-list { background-color: @ds_card; border-radius: 16px;
+    border: none; }
+row { border-radius: 12px; }
+row:hover { background-color: @ds_hover; }
+row:selected, row:selected:focus { background-color: @ds_selected; color: @ds_fg; }
+frame > border { border-radius: 16px; border-color: @ds_outline; }
+
+/* -- menus, pop-ups and dialogs: big rounded cards, no heavy borders -- */
+popover, popover.background, popover > contents, menu, .menu, .context-menu {
+    background-color: @ds_raised; border-radius: 16px; border: 1px solid @ds_outline; box-shadow: none; }
+menu menuitem, .menu menuitem { border-radius: 10px; margin: 2px 6px; padding: 6px 10px; }
+menu menuitem:hover, .menu menuitem:hover { background-color: @ds_hover; color: @ds_fg; }
+dialog, messagedialog, messagedialog.background, dialog.background { border-radius: 24px; background-color: @ds_raised; }
+tooltip, tooltip.background { border-radius: 12px; background-color: @ds_tooltip; color: @ds_tooltip_fg; }
+
+/* -- tabs: pill indicator instead of underline -- */
+notebook > header { background-color: @ds_bg; border: none; box-shadow: none; }
+notebook > header tab { border-radius: 999px; margin: 4px 2px; padding: 4px 14px; box-shadow: none; }
+notebook > header tab:checked { background-color: @ds_selected; }
+
+/* -- selection and focus -- */
+selection, entry selection, textview text selection { background-color: @ds_accent; color: #ffffff; }
+
+/* -- scrollbars: thin pills -- */
+scrollbar slider { border-radius: 999px; min-width: 6px; min-height: 6px; background-color: @ds_fg_faint; }
+scrollbar slider:hover { background-color: @ds_fg_dim; }
+scrollbar, scrollbar trough { background-color: transparent; border: none; }

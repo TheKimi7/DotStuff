@@ -1,0 +1,55 @@
+/* ===== DotStuff lock screen (cinnamon-screensaver reads .csstage rules from the GTK theme) ===== */
+.csstage .clock { color: #ffffff; text-shadow: none; }
+.csstage .unlockbox { color: #ffffff; font-size: 16px; text-shadow: none; }
+.csstage .toppanel { border-color: rgba(255, 255, 255, 0.08); border-style: solid; color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.85); background-image: none; }
+.csstage .audiopanel { border-width: 0 1px 1px 0; border-radius: 0 0 16px 0; }
+.csstage .infopanel { border-width: 0 0 1px 1px; border-radius: 0 0 0 16px; }
+.csstage .notificationwidget,
+.csstage .powerwidget { font-family: "JetBrains Mono"; font-size: 12px; color: #ffffff;
+    background-color: transparent; background-image: none; text-shadow: none; padding: 6px; }
+.csstage .auth-message { font-family: "JetBrains Mono"; font-size: 14px; color: #d71921; }
+.csstage .caps-message { font-family: "JetBrains Mono"; font-size: 14px; color: #ffffff; }
+.csstage .framedimage { border-radius: 999px; border: 2px solid #ffffff; background-color: #000000;
+    background-clip: border-box; box-shadow: none; }
+.csstage .passwordentry { font-family: "JetBrains Mono"; font-size: 15px; color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.85); background-image: none; border-image: none;
+    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 999px; padding: 6px 16px; box-shadow: none; }
+.csstage .passwordentry progress { margin: 2px 16px; padding: 0; border-radius: 0; border-width: 0 0 2px;
+    border-style: solid; border-color: #d71921; background-color: transparent; background-image: none; }
+.csstage .passwordentry progress:focus { background-color: transparent; }
+.csstage .passwordentry image.left { padding-right: 10px; }
+.csstage .passwordentry:backdrop { font-family: "JetBrains Mono"; font-size: 14px; color: #d71921; }
+.csstage .passwordentry:hover { border-color: rgba(255, 255, 255, 0.3); background-color: rgba(0, 0, 0, 0.9); }
+.csstage .passwordentry:focus,
+.csstage .passwordentry:hover:focus,
+.csstage .passwordentry:active,
+.csstage .passwordentry:active:focus { border-color: #ffffff; background-color: rgba(0, 0, 0, 0.9); box-shadow: none; }
+.csstage .transparentbutton,
+.csstage .osk-button { -gtk-icon-style: requested; border: 1px solid rgba(255, 255, 255, 0.15);
+    border-image: none; background-image: none; background-color: rgba(0, 0, 0, 0.6); border-radius: 999px;
+    -gtk-outline-radius: 999px; outline-color: transparent; color: #ffffff; padding: 6px; box-shadow: none; }
+.csstage .transparentbutton image,
+.csstage .osk-button image { color: #ffffff; }
+.csstage .transparentbutton:disabled image,
+.csstage .osk-button:disabled image { color: #444444; }
+.csstage .transparentbutton:hover,
+.csstage .osk-button:hover { border-color: rgba(255, 255, 255, 0.3); background-color: rgba(255, 255, 255, 0.12); box-shadow: none; }
+.csstage .transparentbutton:focus,
+.csstage .transparentbutton:active,
+.csstage .transparentbutton:hover:focus,
+.csstage .transparentbutton:active:focus,
+.csstage .osk-button:focus,
+.csstage .osk-button:active,
+.csstage .osk-button:hover:focus,
+.csstage .osk-button:active:focus { border-color: #ffffff; background-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
+.csstage .volumeslider { min-height: 24px; min-width: 100px; background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff; padding: 3px 0; }
+.csstage scale.volumeslider slider { min-height: 24px; min-width: 4px; margin: -9px; }
+.csstage .volumeslider:disabled { background-color: rgba(255, 255, 255, 0.3); }
+.csstage .trackname { font-family: "NType 82"; font-size: 14px; text-shadow: none;
+    background-image: none; background-color: transparent; }
+.csstage .albumartist { font-family: "JetBrains Mono"; font-size: 10px; color: rgba(255, 255, 255, 0.6);
+    text-shadow: none; background-image: none; background-color: transparent; }
+.csstage GtkViewport { background-color: transparent; background-image: none; }
+.csstage .osk-popover { background-color: #000000; }

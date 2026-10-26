@@ -1,0 +1,47 @@
+
+/* ===== DotStuff: Android / Nothing OS layer (Cinnamon panel, menus, pop-ups) =====
+   Double-brace placeholders are filled per variant by build.py (St has no named colours). */
+
+.panel-top, .panel-bottom, .panel-left, .panel-right {
+    background-color: {{panel}}; color: {{fg}}; box-shadow: none; }
+.panel-bottom { border-top: 1px solid {{outline}}; }
+.panel-top { border-bottom: 1px solid {{outline}}; }
+.applet-box:hover, .panel-button:hover { background-color: {{hover}}; border-radius: 12px; }
+
+/* pop-ups and menus: rounded cards, Quick-Settings feel */
+.popup-menu-content, .menu .popup-menu-content, .popup-combo-menu .popup-menu-content {
+    background-color: {{raised}}; color: {{fg}}; border: 1px solid {{outline}}; border-radius: 20px;
+    padding: 8px; box-shadow: none; }
+.popup-menu-item { border-radius: 12px; padding: 6px 10px; }
+.popup-menu-item:active, .popup-menu-item:hover, .popup-menu-item.selected {
+    background-color: {{hover}}; color: {{fg}}; }
+.popup-sub-menu { background-color: {{card}}; border-radius: 14px; }
+.popup-separator-menu-item { background-color: {{outline}}; }
+
+/* application menu */
+.menu-favorites-box, .menu-places-box, .menu-categories-box, .menu-applications-outer-box {
+    background-color: transparent; }
+.menu-category-button, .menu-application-button { border-radius: 12px; }
+.menu-category-button-selected, .menu-application-button-selected, .menu-favorites-button:hover {
+    background-color: {{hover}}; color: {{fg}}; border-radius: 12px; }
+#menu-search-entry { border-radius: 999px; background-color: {{card}}; border: 1px solid {{outline}};
+    color: {{fg}}; padding: 6px 14px; }
+#menu-search-entry:focus { border-color: {{fg}}; }
+
+/* notifications, OSD, switcher: cards */
+#notification, .notification { background-color: {{raised}}; border-radius: 20px; border: 1px solid {{outline}};
+    color: {{fg}}; }
+.osd-window, .info-osd, .switcher-list, .window-list-preview {
+    background-color: {{raised}}; border-radius: 20px; border: 1px solid {{outline}}; color: {{fg}}; box-shadow: none; }
+.calendar { background-color: transparent; }
+.calendar-day-base { border-radius: 999px; }
+.calendar-today { background-color: {{accent}}; color: #ffffff; border-radius: 999px; }
+.calendar-events-main-box { background-gradient-direction: none; background-color: {{card}}; border-radius: 16px; }
+
+/* toggles in pop-ups use the accent */
+.toggle-switch-us:checked, .toggle-switch-intl:checked { background-color: {{accent}}; }
+
+/* ===== DotStuff: shell fonts (panel clock NType 82, menus and calendar dot-matrix) ===== */
+stage { font-family: "Ndot57Caps"; }
+.applet-label { font-family: "NType 82"; font-weight: bold; }
+.calendar-today-day-label, .calendar-today-date-label, .calendar-month-label { font-family: "Ndot57Caps"; font-weight: normal; }

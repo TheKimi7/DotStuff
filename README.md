@@ -14,10 +14,11 @@ installed and configured with one script, and undone with one more.**
 
 | Part | Details |
 |---|---|
-| **DotStuff theme** | Black windows and title bars, a black panel, menus and pop-ups, red accent, bold NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Based on [Orchis](https://github.com/vinceliuice/Orchis-theme). |
+| **DotStuff-Dark and DotStuff-Light themes** | Android / Nothing OS look in a fixed black or white palette with Nothing red: pill buttons and text fields, Material 3 switches, rounded cards, menus and dialogs, pill tabs. Black (or white) panel, bold NType 82 for the panel clock and a dot-matrix font for menus and the calendar. Apps keep your normal font. Built from [Orchis](https://github.com/vinceliuice/Orchis-theme). |
+| **Light and dark mode** | `./install.sh mode light` / `./install.sh mode dark` switches the theme, the icons and the desktop widgets together. The lock screen stays dark. |
 | **Lock screen** | Big dot-matrix clock, black pill password field with a red typing line, round avatar, black panels, red error messages. Styled from the DotStuff theme, so no extra software. |
-| **Monochrome icons** | Two icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**. Every Papirus app, settings and session icon becomes a white stencil on a dark tile; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
-| **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. Right-click > Configure to change them. |
+| **Monochrome icons** | Icon themes made by [monotile](vendor/monotile): **Monotile-Circle** and **Monotile-Squircle**, plus **Monotile-Light-Circle** and **Monotile-Light-Squircle** for light mode (black symbol on a light-grey tile). Every Papirus app, settings and session icon becomes a white stencil on a dark tile; folders are Papirus's black folders and file types are greyscale; devices and coloured status icons become white line art. New apps are converted automatically. |
+| **Desktop widgets** | Five native Cinnamon desklets: clock (12-dot dial), date, weather, RAM/disk rings and a 24-dot day bar. They follow light and dark mode. Right-click > Configure to change them. |
 | **Fonts** | Nothing's Ndot, NType 82 and Lettera Mono (from [xeji01/nothingfont](https://github.com/xeji01/nothingfont)), Space Mono/Grotesk and JetBrains Mono. |
 | **Cursor** | [AOSP Cursors](https://github.com/Tech-Tac/aosp-cursors), Android's cursor set, at size 18. |
 | **Wallpaper** | NothingWall, from [Panacea](https://github.com/EnsixD/Panacea). |
@@ -39,12 +40,13 @@ cd DotStuff
 librsvg2-common gtk-update-icon-cache fontconfig papirus-icon-theme`) and offers to install
 the missing ones with `sudo apt-get`. That is the only step that needs root; everything else
 goes into your home folder. The first run takes about 5–10 minutes (it converts roughly 10,000
-icons into two icon themes, about 570 MB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
+icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so the new fonts and theme show up; your windows stay open.
 
 ### Options
 
 | Option | Effect |
 |---|---|
+| `--mode light` | start in light mode (default: dark); switch any time with `./install.sh mode dark` |
 | `--shape squircle` | squircle app icons instead of circles (both icon themes are always installed; switch any time in *System Settings > Themes*) |
 | `--only fonts,theme,...` / `--skip ...` | install only some parts: `fonts wallpaper theme cursor fontsettings icons menu desklets prompt` |
 | `--prompt` | also colour the bash prompt (added as a marked block in `~/.bashrc`) |
@@ -71,14 +73,14 @@ existing AOSP cursor install, or a menu button with your own custom icon) are le
 
 | Setting | Value |
 |---|---|
-| Applications, desktop (panel) and window-border theme | DotStuff |
-| Icon theme | Monotile-Circle or Monotile-Squircle |
+| Applications, desktop (panel) and window-border theme | DotStuff-Dark (or DotStuff-Light) |
+| Icon theme | Monotile-Circle or Monotile-Squircle (Light versions in light mode) |
 | Cursor | aosp-cursors, size 18 |
 | Window title font / desktop icon font | Ndot57Caps 12 / Ndot55Caps 10 |
 | Font smoothing | RGBA anti-aliasing, slight hinting |
 | Lock screen fonts (time / date / messages) | Ndot 57 112 / Ndot57Caps 22 / NType 82 14 |
 | Wallpaper | NothingWall (zoom) |
-| Colour scheme for GTK4 apps | prefer dark |
+| Colour scheme for GTK4 apps | prefer dark (prefer light in light mode) |
 | Desklets | Mono Date, Clock, Weather, System, Day at the top left |
 | Menu applet | custom icon `dotstuff-menu`, no label (only if it does not already use a custom icon) |
 
@@ -95,12 +97,26 @@ Your normal application font is not changed.
 - If the menu applet has never been opened on a fresh account, its settings file does not exist
   yet; open its settings once and run `./install.sh --only menu`.
 
+## Light and dark
+
+```sh
+./install.sh mode light    # DotStuff-Light, Monotile-Light icons, white desklet cards
+./install.sh mode dark     # back to black
+```
+
+Your tile shape is kept, the desklets switch by themselves, and `--restore` still puts back
+whatever you had before DotStuff, however often you switch.
+
 ## Development
 
 ```sh
 python3 -m unittest discover -s tests                                  # DotStuff
 (cd vendor/monotile && PYTHONPATH=. python3 -m unittest discover -s tests)   # monotile
 ```
+
+The themes in `theme/` are built from Orchis's source (the pinned tag in `theme-src/build.py`)
+with `python3 theme-src/build.py /path/to/Orchis-theme` (needs the `libsass` Python package);
+the Android / Nothing layer lives in `theme-src/overlay/`.
 
 Tests run against temporary home folders and an in-memory settings store; they never touch your
 desktop or the network. `DOTSTUFF_CACHE=/path/to/files` makes the installer use pre-downloaded

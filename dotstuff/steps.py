@@ -16,10 +16,15 @@ PROMPT_BEGIN = "# >>> DotStuff prompt >>>"
 PROMPT_END = "# <<< DotStuff prompt <<<"
 
 
+THEME_NAMES = {"dark": "DotStuff-Dark", "light": "DotStuff-Light"}
+LEGACY_THEME = "DotStuff"          # the single dark theme of DotStuff 0.1
+
+
 class Ctx:
-    def __init__(self, state, backend, dry_run=False, log=print, shape="circle", reload=True, prompt=False):
+    def __init__(self, state, backend, dry_run=False, log=print, shape="circle", reload=True, prompt=False,
+                 mode="dark"):
         self.state, self.backend, self.dry_run, self.log = state, backend, dry_run, log
-        self.shape, self.reload, self.prompt = shape, reload, prompt
+        self.shape, self.reload, self.prompt, self.mode = shape, reload, prompt, mode
 
     def own(self, path):
         if path not in self.state["owned"]:
@@ -113,27 +118,70 @@ def _tree_digest(root):
     return h.hexdigest()
 
 
-def theme(c):
-    dest = os.path.join(paths.themes_dir(), "DotStuff")
+def _install_theme(c, name):
+    """Copy one built theme into ~/.themes. False if a foreign folder of that name is in the way."""
+    dest = os.path.join(paths.themes_dir(), name)
+    src = os.path.join(paths.THEMES_SRC, name)
     if os.path.exists(dest) and not os.path.exists(os.path.join(dest, MARKER)):
         c.log(f"  skip theme: {dest} exists and was not installed by DotStuff")
-        return
-    if not (os.path.isdir(dest) and _tree_digest(dest) == _tree_digest(paths.THEME_SRC)):
-        c.log("  theme DotStuff (GTK 2/3/4, Cinnamon panel and menus, window borders)")
-    else:
-        dest = None
-    if dest and not c.dry_run:
+        return False
+    if os.path.isdir(dest) and _tree_digest(dest) == _tree_digest(src):
+        return True
+    c.log(f"  theme {name} (GTK 2/3/4, Cinnamon panel and menus, window borders)")
+    if not c.dry_run:
         tmp = dest + ".new"
         shutil.rmtree(tmp, ignore_errors=True)
-        shutil.copytree(paths.THEME_SRC, tmp, symlinks=True)
+        shutil.copytree(src, tmp, symlinks=True)
         open(os.path.join(tmp, MARKER), "w").close()
         shutil.rmtree(dest, ignore_errors=True)
         os.replace(tmp, dest)
         c.own(dest)
+    return True
+
+
+def theme(c):
+    ok = {mode: _install_theme(c, name) for mode, name in THEME_NAMES.items()}
+    old = os.path.join(paths.themes_dir(), LEGACY_THEME)
+    if c.owns(old) and os.path.exists(os.path.join(old, MARKER)):
+        c.log(f"  remove the old single theme {LEGACY_THEME} (replaced by {', '.join(THEME_NAMES.values())})")
+        if not c.dry_run:
+            shutil.rmtree(old)
+            c.state["owned"].remove(old)
+    if ok[c.mode]:
+        apply_theme_settings(c, c.mode)
+
+
+def apply_theme_settings(c, mode):
+    name = THEME_NAMES[mode]
     for schema, key in (("org.cinnamon.desktop.interface", "gtk-theme"), ("org.gnome.desktop.interface", "gtk-theme"),
                         ("org.cinnamon.theme", "name"), ("org.cinnamon.desktop.wm.preferences", "theme")):
-        apply_setting(c.state, c.backend, schema, key, "DotStuff", c.dry_run, c.log)
-    apply_setting(c.state, c.backend, "org.gnome.desktop.interface", "color-scheme", "prefer-dark", c.dry_run, c.log)
+        apply_setting(c.state, c.backend, schema, key, name, c.dry_run, c.log)
+    apply_setting(c.state, c.backend, "org.gnome.desktop.interface", "color-scheme",
+                  "prefer-dark" if mode == "dark" else "prefer-light", c.dry_run, c.log)
+
+
+def icon_theme_name(shape, mode):
+    """Monotile-Circle, Monotile-Light-Squircle, ..."""
+    return "Monotile-" + ("Light-" if mode == "light" else "") + shape.capitalize()
+
+
+def set_mode(c):
+    """Switch between light and dark: theme, colour scheme and the matching icons.
+    Desklets follow the theme by themselves; the lock screen stays dark."""
+    name = THEME_NAMES[c.mode]
+    if not os.path.isdir(os.path.join(paths.themes_dir(), name)):
+        raise SystemExit(f"{name} is not installed; run ./install.sh --only theme first")
+    apply_theme_settings(c, c.mode)
+    current = c.backend.current("org.cinnamon.desktop.interface", "icon-theme")
+    if not current.startswith("Monotile-"):
+        c.log(f"  icon theme {current} is not a Monotile theme; left as it is")
+        return
+    target = icon_theme_name("squircle" if current.endswith("Squircle") else "circle", c.mode)
+    if not os.path.isdir(os.path.join(paths.icons_dir(), target)):
+        c.log(f"  {target} not generated yet; run ./install.sh --only icons")
+        return
+    for schema in ("org.cinnamon.desktop.interface", "org.gnome.desktop.interface"):
+        apply_setting(c.state, c.backend, schema, "icon-theme", target, c.dry_run, c.log)
 
 
 def cursor(c):
@@ -167,9 +215,9 @@ def icons(c):
     from . import paths as P
     mcfg = os.path.join(P.config_home(), "monotile")
     _container(c, mcfg)                    # monotile's settings folder, if DotStuff creates it
-    c.log(f"  icons Monotile-Circle and Monotile-Squircle (applying {c.shape})")
+    name = icon_theme_name(c.shape, c.mode)
+    c.log(f"  icons Monotile-Circle, -Squircle and their Light versions (applying {name})")
     _monotile("generate", "--shape", c.shape, *(["--dry-run"] if c.dry_run else []))
-    name = "Monotile-" + c.shape.capitalize()
     for schema in ("org.cinnamon.desktop.interface", "org.gnome.desktop.interface"):
         apply_setting(c.state, c.backend, schema, "icon-theme", name, c.dry_run, c.log)
     if c.dry_run:

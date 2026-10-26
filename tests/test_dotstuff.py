@@ -23,6 +23,9 @@ class FakeSettings:
     def __init__(self, user=None, defaults=None):
         self.defaults = defaults or {
             ("org.cinnamon.desktop.interface", "gtk-theme"): "Mint-Y",
+            ("org.cinnamon.theme", "name"): "Mint-Y-Dark",
+            ("org.gnome.desktop.interface", "color-scheme"): "default",
+            ("org.cinnamon.desktop.interface", "icon-theme"): "Mint-Y",
             ("org.cinnamon.desktop.interface", "cursor-size"): 24,
             ("org.cinnamon", "enabled-desklets"): [],
             ("org.cinnamon", "next-desklet-id"): 0,
@@ -142,7 +145,7 @@ class SettingsAndRestore(Isolated):
         steps.theme(c)
         steps.menu(c)
         self.assertEqual(b.user, {})
-        self.assertFalse(os.path.exists(os.path.join(paths.themes_dir(), "DotStuff")))
+        self.assertFalse(os.path.exists(os.path.join(paths.themes_dir(), "DotStuff-Dark")))
         self.assertFalse(os.path.exists(paths.state_dir()))
 
 
@@ -182,9 +185,11 @@ class Steps(Isolated):
         b = FakeSettings()
         c = self.ctx(b)
         steps.theme(c)
-        dest = os.path.join(paths.themes_dir(), "DotStuff")
-        self.assertTrue(os.path.exists(os.path.join(dest, steps.MARKER)))
-        self.assertEqual(b.current("org.cinnamon.desktop.interface", "gtk-theme"), "DotStuff")
+        for name in ("DotStuff-Dark", "DotStuff-Light"):
+            self.assertTrue(os.path.exists(os.path.join(paths.themes_dir(), name, steps.MARKER)))
+        dest = os.path.join(paths.themes_dir(), "DotStuff-Dark")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "gtk-theme"), "DotStuff-Dark")
+        self.assertEqual(b.current("org.gnome.desktop.interface", "color-scheme"), "prefer-dark")
         before = os.stat(os.path.join(dest, "index.theme")).st_mtime_ns
         self.logs.clear()
         steps.theme(c)
@@ -192,11 +197,48 @@ class Steps(Isolated):
         self.assertFalse([m for m in self.logs if "theme DotStuff" in m])        # not reinstalled
 
     def test_foreign_theme_folder_is_not_touched(self):
-        dest = os.path.join(paths.themes_dir(), "DotStuff")
+        dest = os.path.join(paths.themes_dir(), "DotStuff-Dark")
         os.makedirs(dest)
         open(os.path.join(dest, "mine.css"), "w").close()
-        steps.theme(self.ctx(FakeSettings()))
+        b = FakeSettings()
+        steps.theme(self.ctx(b))
         self.assertEqual(os.listdir(dest), ["mine.css"])
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "gtk-theme"), "Mint-Y")
+
+    def test_old_single_theme_is_replaced(self):
+        old = os.path.join(paths.themes_dir(), "DotStuff")
+        os.makedirs(old)
+        open(os.path.join(old, steps.MARKER), "w").close()
+        c = self.ctx(FakeSettings())
+        c.own(old)
+        steps.theme(c)
+        self.assertFalse(os.path.exists(old))
+        self.assertNotIn(old, c.state["owned"])
+
+    def test_mode_switches_theme_icons_and_back(self):
+        b = FakeSettings(user={("org.cinnamon.desktop.interface", "icon-theme"): "Monotile-Squircle"})
+        c = self.ctx(b)
+        steps.theme(c)
+        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Light-Squircle"))
+        os.makedirs(os.path.join(paths.icons_dir(), "Monotile-Squircle"))
+        c.mode = "light"
+        steps.set_mode(c)
+        self.assertEqual(b.current("org.cinnamon.theme", "name"), "DotStuff-Light")
+        self.assertEqual(b.current("org.gnome.desktop.interface", "color-scheme"), "prefer-light")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Light-Squircle")
+        c.mode = "dark"
+        steps.set_mode(c)
+        self.assertEqual(b.current("org.cinnamon.theme", "name"), "DotStuff-Dark")
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle")
+        save_state(c.state)
+        restore(b, log=self.logs.append)                  # originals survive any number of switches
+        self.assertEqual(b.current("org.cinnamon.desktop.interface", "icon-theme"), "Monotile-Squircle")
+        self.assertEqual(b.current("org.cinnamon.theme", "name"), "Mint-Y-Dark")
+
+    def test_mode_needs_installed_theme(self):
+        c = self.ctx(FakeSettings(), mode="light")
+        with self.assertRaises(SystemExit):
+            steps.set_mode(c)
 
     def test_prompt_block_added_once_and_removed(self):
         rc = paths.bashrc()

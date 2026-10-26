@@ -2,7 +2,7 @@
 import os
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-THEME_SRC = os.path.join(REPO, "theme", "DotStuff")
+THEMES_SRC = os.path.join(REPO, "theme")            # DotStuff-Dark, DotStuff-Light
 MENU_ICON_SRC = os.path.join(REPO, "assets", "dotstuff-menu.svg")
 MONOTILE = os.path.join(REPO, "vendor", "monotile")
 
@@ -42,6 +42,10 @@ def wallpaper_path():
 
 def themes_dir():
     return os.path.join(home(), ".themes")
+
+
+def icons_dir():
+    return os.path.join(data_home(), "icons")
 
 
 def cursors_parent():

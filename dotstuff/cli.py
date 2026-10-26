@@ -1,4 +1,4 @@
-"""DotStuff command line: install, restore, status."""
+"""DotStuff command line: install, mode, restore, status."""
 import argparse
 import os
 import sys
@@ -24,7 +24,8 @@ def cmd_install(a, backend):
     if a.prompt or "prompt" in only:
         chosen += steps.OPTIONAL
     state = load_state()
-    c = steps.Ctx(state, backend, dry_run=a.dry_run, shape=a.shape, reload=not a.no_reload, prompt=a.prompt)
+    c = steps.Ctx(state, backend, dry_run=a.dry_run, shape=a.shape, reload=not a.no_reload, prompt=a.prompt,
+                  mode=a.mode)
     print("DotStuff " + ("dry run: nothing will be changed" if a.dry_run else "install"))
     try:
         for name, fn in chosen:
@@ -39,6 +40,18 @@ def cmd_install(a, backend):
     if not a.dry_run:
         steps.reload_shell(c)
         print("Done. Undo everything with: ./install.sh --restore")
+
+
+def cmd_mode(a, backend):
+    state = load_state()
+    c = steps.Ctx(state, backend, dry_run=a.dry_run, mode=a.mode)
+    try:
+        steps.set_mode(c)
+    finally:
+        if not a.dry_run:
+            backend.sync()
+            save_state(state)
+    print(f"{a.mode.capitalize()} mode." + (" (dry run)" if a.dry_run else ""))
 
 
 def cmd_restore(a, backend):
@@ -62,6 +75,7 @@ def main(argv=None):
 
     i = sub.add_parser("install", help="install and configure everything (default)")
     i.add_argument("--shape", choices=("circle", "squircle"), default="circle", help="app icon tile shape")
+    i.add_argument("--mode", choices=("dark", "light"), default="dark", help="start in dark or light mode")
     i.add_argument("--only", help="comma-separated parts: " + ",".join(steps.STEP_NAMES))
     i.add_argument("--skip", help="comma-separated parts to leave out")
     i.add_argument("--prompt", action="store_true", help="also colour the bash prompt (white user, red path)")
@@ -69,6 +83,11 @@ def main(argv=None):
     i.add_argument("--no-reload", action="store_true", help="do not restart Cinnamon at the end")
     i.add_argument("--force", action="store_true", help="run even if the session is not Cinnamon")
     i.set_defaults(func=cmd_install)
+
+    m = sub.add_parser("mode", help="switch between dark and light (theme, icons, desklets)")
+    m.add_argument("mode", choices=("dark", "light"))
+    m.add_argument("--dry-run", action="store_true", help="show what would change, change nothing")
+    m.set_defaults(func=cmd_mode)
 
     r = sub.add_parser("restore", help="put every setting and edited file back the way it was")
     r.add_argument("--purge", action="store_true", help="also delete everything DotStuff installed")

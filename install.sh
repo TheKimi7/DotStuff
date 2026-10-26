@@ -2,6 +2,8 @@
 # DotStuff installer for Cinnamon (Debian / Ubuntu / Linux Mint).
 #   ./install.sh                     install and configure everything
 #   ./install.sh --shape squircle    squircle app icons instead of circles
+#   ./install.sh --mode light        start in light mode (default dark)
+#   ./install.sh mode light|dark     switch an installed setup between light and dark
 #   ./install.sh --dry-run           show what would change
 #   ./install.sh --only icons,cursor (parts: fonts wallpaper theme cursor fontsettings icons menu desklets prompt)
 #   ./install.sh --prompt            also colour the bash prompt
@@ -14,6 +16,7 @@ cmd=install
 case "${1:-}" in
     --restore) cmd=restore; shift ;;
     --status) cmd=status; shift ;;
+    mode) cmd=mode; shift ;;
 esac
 
 if [ "$cmd" = install ] && [[ " $* " != *" --skip-deps "* ]]; then

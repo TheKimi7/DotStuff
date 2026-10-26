@@ -5,7 +5,7 @@
 #   ./install.sh --mode light        start in light mode (default dark)
 #   ./install.sh mode light|dark     switch an installed setup between light and dark
 #   ./install.sh --dry-run           show what would change
-#   ./install.sh --only icons,cursor (parts: fonts wallpaper theme cursor fontsettings terminal icons menu desklets prompt)
+#   ./install.sh --only icons,cursor (parts: fonts wallpaper theme cursor fontsettings terminal monotile icons menu desklets prompt)
 #   ./install.sh --prompt            also colour the bash prompt
 #   ./install.sh --restore [--purge] undo (and optionally delete what was installed)
 #   ./install.sh --status

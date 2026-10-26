@@ -319,6 +319,15 @@ def fontsettings(c):
     apply_setting(c.state, b, "org.cinnamon.desktop.screensaver", "font-message", "NType 82 14", c.dry_run, c.log)
 
 
+def monotile(c):
+    """The icon generator and desktop widgets, downloaded from their own repository."""
+    where = mt.ensure(c)
+    if where and not c.dry_run and os.environ.get("DOTSTUFF_MONOTILE"):
+        c.log(f"  using monotile from {where} ($DOTSTUFF_MONOTILE)")
+    elif where:
+        c.log(f"  monotile {pins.MONOTILE_COMMIT[:7]} ready")
+
+
 def icons(c):
     from . import paths as P
     mcfg = os.path.join(P.config_home(), "monotile")
@@ -326,6 +335,8 @@ def icons(c):
     name = icon_theme_name(c.shape, c.mode)
     c.log(f"  icons Monotile-Circle and Monotile-Squircle, -Dark and -Light (applying {name})")
     if mt.ensure(c):
+        if not c.dry_run:
+            c.log("  converting about 10,000 icons; this takes 5 to 10 minutes the first time")
         _monotile("generate", "--shape", c.shape, *(["--dry-run"] if c.dry_run else []))
     else:
         c.log("  (monotile is downloaded first, then about 10,000 icons are converted)")
@@ -437,7 +448,8 @@ def reload_shell(c):
 
 
 ALL = [("fonts", fonts), ("wallpaper", wallpaper), ("theme", theme), ("cursor", cursor),
-       ("fontsettings", fontsettings), ("terminal", terminal), ("icons", icons), ("menu", menu),
+       ("fontsettings", fontsettings), ("terminal", terminal), ("monotile", monotile),
+       ("icons", icons), ("menu", menu),
        ("desklets", desklets)]
 OPTIONAL = [("prompt", prompt)]
 STEP_NAMES = [n for n, _ in ALL + OPTIONAL]

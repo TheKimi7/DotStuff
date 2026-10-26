@@ -29,7 +29,7 @@ def ensure(c):
     stamp = os.path.join(dest, STAMP)
     if os.path.exists(stamp) and open(stamp, encoding="utf-8").read().strip() == pins.MONOTILE_COMMIT:
         return dest
-    c.log(f"  monotile {pins.MONOTILE_COMMIT[:7]} from github.com/TheKimi7/monotile")
+    c.log(f"  download monotile {pins.MONOTILE_COMMIT[:7]} from github.com/TheKimi7/monotile (about 9 MB)")
     if c.dry_run:
         return dest if installed() else None
     archive = fetch.get(pins.MONOTILE_URL, pins.MONOTILE_SHA, name=f"monotile-{pins.MONOTILE_COMMIT}.tar.gz")
@@ -43,4 +43,5 @@ def ensure(c):
     shutil.rmtree(dest, ignore_errors=True)
     os.replace(new, dest)
     c.own(dest)
+    c.log(f"  installed monotile in {dest.replace(paths.home(), '~', 1)}")
     return dest

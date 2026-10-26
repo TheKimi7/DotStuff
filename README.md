@@ -52,7 +52,7 @@ icons into four icon themes, about 1.1 GB) and restarts Cinnamon at the end so t
 |---|---|
 | `--mode light` | start in light mode (default: dark); switch any time with `./install.sh mode dark` |
 | `--shape squircle` | squircle app icons instead of circles (both icon themes are always installed; switch any time in *System Settings > Themes*) |
-| `--only fonts,theme,...` / `--skip ...` | install only some parts: `fonts wallpaper theme cursor fontsettings terminal icons menu desklets prompt` |
+| `--only fonts,theme,...` / `--skip ...` | install only some parts: `fonts wallpaper theme cursor fontsettings terminal monotile icons menu desklets prompt` |
 | `--prompt` | also colour the bash prompt (added as a marked block in `~/.bashrc`) |
 | `--dry-run` | list what would change, change nothing |
 | `--no-reload` | do not restart Cinnamon at the end |

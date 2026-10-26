@@ -51,6 +51,12 @@ def cmd_install(a, backend):
             fn(c)
             if not a.dry_run:
                 save_state(state)          # progress is saved, so restore works after a failure too
+    except (KeyboardInterrupt, subprocess.CalledProcessError) as e:
+        stopped = isinstance(e, KeyboardInterrupt) or e.returncode == 130
+        print("\nStopped." if stopped else f"\n[{name}] failed.",
+              "Everything done so far is kept: run ./install.sh again to continue "
+              "(finished parts are skipped), or ./install.sh --restore to undo.")
+        raise SystemExit(130 if stopped else 1)
     finally:
         if not a.dry_run:
             backend.sync()
